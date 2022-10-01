@@ -5,7 +5,7 @@ mod character;
 mod debug;
 mod game_area;
 mod game_over;
-mod laser;
+mod weapon;
 mod loading;
 mod menu;
 mod player;
@@ -25,7 +25,7 @@ use camera::CameraPlugin;
 use character::HealthPlugin;
 use debug::DebugPlugin;
 use game_over::GameOver;
-use laser::LaserPlugin;
+use weapon::WeaponPlugin;
 
 pub const GAME_AREA_WIDTH: f32 = 1775.0;
 pub const GAME_AREA_HEIGHT: f32 = 1000.0;
@@ -63,7 +63,7 @@ impl Plugin for GamePlugin {
             .add_plugin(GameAreaPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(HealthPlugin)
-            .add_plugin(LaserPlugin);
+            .add_plugin(WeaponPlugin);
 
         #[cfg(debug_assertions)]
         {

@@ -8,9 +8,12 @@ pub struct GameAreaPlugin;
 
 impl Plugin for GameAreaPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(wall_setup));
+        app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(wall_setup)).add_system_set(SystemSet::on_exit(GameState::Playing).with_system(drop_game_area));
     }
 }
+
+#[derive(Component)]
+pub struct GameArea;
 
 fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
     let wall_texture = &textures.wall_texture;
@@ -103,10 +106,18 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
 
     commands
         .spawn()
+        // Later move it to an entity containing the entire game area (including floors and windows)
+        .insert(GameArea)
         .insert(Name::new("Walls"))
         .insert(Visibility::default())
         .insert(ComputedVisibility::default())
         .insert(Transform::default())
         .insert(GlobalTransform::default())
         .push_children(&*walls);
+}
+
+fn drop_game_area(mut commands: Commands, game_area: Query<Entity, With<GameArea>>) {
+    for game_area in game_area.iter() {
+        commands.entity(game_area).despawn_recursive();
+    }
 }
