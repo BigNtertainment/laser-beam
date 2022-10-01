@@ -102,16 +102,19 @@ fn move_player(
             (Vec2::new(1., -1.) * bounding_box / 2.).extend(0.0),
             0.,
         );
+
         lines.line(
             (Vec2::new(1., -1.) * bounding_box / 2.).extend(0.0),
             (Vec2::new(-1., -1.) * bounding_box / 2.).extend(0.0),
             0.,
         );
+
         lines.line(
             (Vec2::new(-1., -1.) * bounding_box / 2.).extend(0.0),
             (Vec2::new(-1., 1.) * bounding_box / 2.).extend(0.0),
             0.,
         );
+
         lines.line(
             (Vec2::new(-1., 1.) * bounding_box / 2.).extend(0.0),
             (Vec2::new(1., 1.) * bounding_box / 2.).extend(0.0),
@@ -122,6 +125,7 @@ fn move_player(
             .translation
             .x
             .clamp(-bounding_box.x / 2.0, bounding_box.x / 2.0);
+
         player_transform.translation.y = player_transform
             .translation
             .y
