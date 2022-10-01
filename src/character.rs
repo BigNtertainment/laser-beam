@@ -1,5 +1,13 @@
-use bevy::prelude::*;
+use bevy::{prelude::*};
 use bevy_inspector_egui::Inspectable;
+
+pub struct HealthPlugin;
+
+impl Plugin for HealthPlugin {
+    fn build(&self, app: &mut App) {
+        app.register_type::<Health>();
+    }
+}
 
 #[derive(Default, Reflect, Inspectable, Component)]
 #[reflect(Component)]

@@ -18,6 +18,7 @@ use bevy::app::App;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use camera::CameraPlugin;
+use character::HealthPlugin;
 use debug::DebugPlugin;
 
 pub const GAME_AREA_WIDTH: f32 = 1000.0;
@@ -49,7 +50,8 @@ impl Plugin for GamePlugin {
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(CameraPlugin)
-            .add_plugin(PlayerPlugin);
+            .add_plugin(PlayerPlugin)
+            .add_plugin(HealthPlugin);
 
         #[cfg(debug_assertions)]
         {
