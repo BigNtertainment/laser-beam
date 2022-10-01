@@ -5,7 +5,9 @@ pub struct HealthPlugin;
 
 impl Plugin for HealthPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<Health>();
+        app.register_type::<Health>()
+            .register_type::<Movement>()
+            .register_type::<Rotation>();
     }
 }
 
@@ -25,7 +27,7 @@ impl Health {
     }
 
     /// # Returns
-	/// True if the health reached zero.
+    /// True if the health reached zero.
     #[allow(unused)]
     pub fn take_damage(&mut self, amount: f32) -> bool {
         self.health -= amount;
@@ -51,4 +53,16 @@ impl Health {
     pub fn get_max_health(&self) -> f32 {
         self.max_health
     }
+}
+
+#[derive(Default, Reflect, Inspectable, Component)]
+#[reflect(Component)]
+pub struct Movement {
+    pub speed: f32,
+}
+
+#[derive(Default, Reflect, Inspectable, Component)]
+#[reflect(Component)]
+pub struct Rotation {
+    pub rotation_speed: f32,
 }

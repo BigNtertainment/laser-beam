@@ -10,7 +10,9 @@ impl Plugin for GameOver {
     fn build(&self, app: &mut App) {
         app.init_resource::<ButtonColors>()
             .add_system_set(SystemSet::on_enter(GameState::GameOver).with_system(setup_menu))
-            .add_system_set(SystemSet::on_update(GameState::GameOver).with_system(click_play_button))
+            .add_system_set(
+                SystemSet::on_update(GameState::GameOver).with_system(click_play_button),
+            )
             .add_system_set(SystemSet::on_exit(GameState::GameOver).with_system(cleanup_menu));
     }
 }

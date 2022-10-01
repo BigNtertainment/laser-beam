@@ -1,9 +1,9 @@
 use crate::actions::Actions;
 use crate::camera::MainCamera;
-use crate::character::Health;
+use crate::character::{Health, Movement, Rotation};
 use crate::loading::TextureAssets;
 use crate::GameState;
-use crate::{WALL_WIDTH, WALL_HEIGHT};
+use crate::{WALL_HEIGHT, WALL_WIDTH};
 use bevy::prelude::*;
 use bevy_prototype_debug_lines::DebugLines;
 
@@ -15,10 +15,7 @@ use std::f32::consts::PI;
 pub struct PlayerPlugin;
 
 #[derive(Component)]
-pub struct Player {
-    move_speed: f32,
-    rotation_speed: f32,
-}
+pub struct Player;
 
 #[derive(Bundle)]
 pub struct PlayerBundle {
@@ -27,6 +24,8 @@ pub struct PlayerBundle {
     name: Name,
     player: Player,
     health: Health,
+    movement: Movement,
+    rotation: Rotation,
 }
 
 /// This plugin handles player related stuff like movement
@@ -41,10 +40,7 @@ impl Plugin for PlayerPlugin {
                     .with_system(camera_follow.after("player_movement"))
                     .with_system(check_if_dead),
             )
-            .add_system_set(
-                SystemSet::on_exit(GameState::Playing)
-                .with_system(drop_player),
-            );
+            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(drop_player));
     }
 }
 
@@ -52,22 +48,22 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
     commands.spawn_bundle(PlayerBundle {
         sprite_budle: SpriteBundle {
             texture: textures.texture_bevy.clone(),
-            transform: Transform::from_translation(Vec3::new(0., 0., 1.)).with_scale(Vec3::new(0.5, 0.5, 1.0)),
+            transform: Transform::from_translation(Vec3::new(0., 0., 1.))
+                .with_scale(Vec3::new(0.5, 0.5, 1.0)),
             ..Default::default()
         },
         name: Name::new("Player"),
-        player: Player {
-            move_speed: 150.,
-            rotation_speed: 1.,
-        },
+        player: Player,
         health: Health::new(100.0),
+        movement: Movement { speed: 100. },
+        rotation: Rotation { rotation_speed: 1.5 },
     });
 }
 
 fn move_player(
     time: Res<Time>,
     actions: Res<Actions>,
-    mut player_query: Query<(&mut Transform, &Handle<Image>, &Player)>,
+    mut player_query: Query<(&mut Transform, &Handle<Image>, &Movement)>,
     images: Res<Assets<Image>>,
     mut lines: ResMut<DebugLines>,
 ) {
@@ -75,10 +71,10 @@ fn move_player(
         return;
     }
 
-    for (mut player_transform, texture, player) in &mut player_query {
+    for (mut player_transform, texture, player_movement) in &mut player_query {
         let movement = Vec3::new(
-            actions.player_movement.unwrap().x * player.move_speed * time.delta_seconds(),
-            actions.player_movement.unwrap().y * player.move_speed * time.delta_seconds(),
+            actions.player_movement.unwrap().x * player_movement.speed * time.delta_seconds(),
+            actions.player_movement.unwrap().y * player_movement.speed * time.delta_seconds(),
             0.,
         );
 
@@ -97,10 +93,7 @@ fn move_player(
             GAME_AREA_HEIGHT - WALL_HEIGHT * 2.0,
         );
 
-        let bounding_box = Vec2::new(
-            game_area.x - player_size.x,
-            game_area.y - player_size.y,
-        );
+        let bounding_box = Vec2::new(game_area.x - player_size.x, game_area.y - player_size.y);
 
         lines.line(
             (Vec2::new(1., 1.) * game_area / 2.).extend(0.0),
@@ -146,13 +139,13 @@ fn move_player(
 fn aim_player(
     time: Res<Time>,
     windows: Res<Windows>,
-    mut player_query: Query<(&mut Transform, &Player)>,
+    mut player_query: Query<(&mut Transform, &Rotation), With<Player>>,
     camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
 ) {
     let window = windows.primary();
     let (camera, camera_transform) = camera_query.single();
 
-    let (mut player_transform, player) = player_query.single_mut();
+    let (mut player_transform, rotation) = player_query.single_mut();
     let player_translation = player_transform.translation.xy();
 
     if let Some(cursor_position) = window.cursor_position() {
@@ -179,7 +172,7 @@ fn aim_player(
             return;
         }
 
-        let rotation_amount = time.delta_seconds() * player.rotation_speed;
+        let rotation_amount = time.delta_seconds() * rotation.rotation_speed;
 
         if diff > 0. {
             if diff < 0.5 {

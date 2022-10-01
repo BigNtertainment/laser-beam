@@ -1,6 +1,8 @@
 use bevy::prelude::*;
 
-use crate::{GameState, GAME_AREA_HEIGHT, GAME_AREA_WIDTH, WALL_HEIGHT, WALL_WIDTH, loading::TextureAssets};
+use crate::{
+    loading::TextureAssets, GameState, GAME_AREA_HEIGHT, GAME_AREA_WIDTH, WALL_HEIGHT, WALL_WIDTH,
+};
 
 pub struct GameAreaPlugin;
 
@@ -95,10 +97,12 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
         );
     }
 
-	commands.spawn()
+    commands
+        .spawn()
         .insert(Name::new("Walls"))
         .insert(Visibility::default())
         .insert(ComputedVisibility::default())
         .insert(Transform::default())
-        .insert(GlobalTransform::default()).push_children(&*walls);
+        .insert(GlobalTransform::default())
+        .push_children(&*walls);
 }

@@ -12,9 +12,9 @@ mod player;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
+use crate::game_area::GameAreaPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
-use crate::game_area::GameAreaPlugin;
 use crate::player::PlayerPlugin;
 
 use bevy::app::App;
