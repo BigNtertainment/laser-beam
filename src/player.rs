@@ -13,7 +13,11 @@ pub struct Player;
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(spawn_player))
-            .add_system_set(SystemSet::on_update(GameState::Playing).with_system(move_player));
+            .add_system_set(
+                SystemSet::on_update(GameState::Playing)
+                    .with_system(move_player.label("player_movement"))
+                    .with_system(camera_follow.after("player_movement")),
+            );
     }
 }
 
@@ -24,7 +28,8 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
             ..Default::default()
         })
-        .insert(Player);
+        .insert(Player)
+        .insert(Name::new("Player"));
 }
 
 fn move_player(
@@ -44,4 +49,15 @@ fn move_player(
     for mut player_transform in &mut player_query {
         player_transform.translation += movement;
     }
+}
+
+fn camera_follow(
+    player: Query<&Transform, With<Player>>,
+    mut camera: Query<&mut Transform, (With<Camera>, Without<Player>)>,
+) {
+    let player = player.single();
+    let mut camera = camera.iter_mut().next().unwrap();
+
+    camera.translation.x = player.translation.x;
+    camera.translation.y = player.translation.y;
 }

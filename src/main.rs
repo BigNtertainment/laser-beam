@@ -9,6 +9,8 @@ use bevy_game::GamePlugin;
 use std::io::Cursor;
 use winit::window::Icon;
 
+const TITLE: &str = "LASER BEAM!";
+
 fn main() {
     App::new()
         .insert_resource(Msaa { samples: 1 })
@@ -16,7 +18,7 @@ fn main() {
         .insert_resource(WindowDescriptor {
             width: 800.,
             height: 600.,
-            title: "Bevy game".to_string(), // ToDo
+            title: TITLE.to_string(),
             canvas: Some("#bevy".to_owned()),
             ..Default::default()
         })
