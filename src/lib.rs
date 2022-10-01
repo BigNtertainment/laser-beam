@@ -6,6 +6,7 @@ mod debug;
 mod loading;
 mod menu;
 mod player;
+mod game_over;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
@@ -20,6 +21,7 @@ use bevy::prelude::*;
 use camera::CameraPlugin;
 use character::HealthPlugin;
 use debug::DebugPlugin;
+use game_over::GameOver;
 
 pub const GAME_AREA_WIDTH: f32 = 1000.0;
 pub const GAME_AREA_HEIGHT: f32 = 800.0;
@@ -37,6 +39,8 @@ enum GameState {
     Playing,
     // Here the menu is drawn and waiting for player interaction
     Menu,
+    // Game over screen ¯\_(ツ)_/¯
+    GameOver,
 }
 
 pub struct GamePlugin;
@@ -47,6 +51,7 @@ impl Plugin for GamePlugin {
             .add_plugin(DebugPlugin)
             .add_plugin(LoadingPlugin)
             .add_plugin(MenuPlugin)
+            .add_plugin(GameOver)
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(CameraPlugin)
