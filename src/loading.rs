@@ -41,4 +41,6 @@ pub struct TextureAssets {
     pub texture_bevy: Handle<Image>,
     #[asset(path = "textures/wall.png")]
     pub wall_texture: Handle<Image>,
+    #[asset(path = "textures/enemy.png")]
+    pub enemy_texture: Handle<Image>,
 }
