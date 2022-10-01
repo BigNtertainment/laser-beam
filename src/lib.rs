@@ -6,6 +6,7 @@ mod debug;
 mod enemy;
 mod game_area;
 mod game_over;
+mod health_bar;
 mod loading;
 mod menu;
 mod player;
@@ -15,6 +16,7 @@ use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
 use crate::enemy::EnemyPlugin;
 use crate::game_area::GameAreaPlugin;
+use crate::health_bar::HealthBarPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
@@ -66,6 +68,7 @@ impl Plugin for GamePlugin {
             .add_plugin(PlayerPlugin)
             .add_plugin(HealthPlugin)
             .add_plugin(WeaponPlugin)
+            .add_plugin(HealthBarPlugin)
             .add_plugin(EnemyPlugin);
 
         #[cfg(debug_assertions)]
