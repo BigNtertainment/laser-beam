@@ -16,6 +16,7 @@ fn camera_setup(mut commands: Commands) {
                 ..Default::default()
             },
 			projection: OrthographicProjection {
+                scale: 1.0,
 				scaling_mode: ScalingMode::Auto { min_width: 960., min_height: 480. },
 				..Default::default()
 			},

@@ -38,12 +38,12 @@ fn control_flying_sound(
         match instance.state() {
             PlaybackState::Paused { .. } => {
                 if actions.player_movement.is_some() {
-                    instance.resume(AudioTween::default());
+                    // instance.resume(AudioTween::default());
                 }
             }
             PlaybackState::Playing { .. } => {
                 if actions.player_movement.is_none() {
-                    instance.pause(AudioTween::default());
+                    // instance.pause(AudioTween::default());
                 }
             }
             _ => {}
