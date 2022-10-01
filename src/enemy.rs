@@ -16,7 +16,8 @@ impl Plugin for EnemyPlugin {
                 SystemSet::on_update(GameState::Playing)
                     .with_system(hit_player)
                     .with_system(follow_player),
-            );
+            )
+            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(drop_enemies));
     }
 }
 
@@ -97,5 +98,11 @@ fn hit_player(
         {
             player_health.take_damage(10.);
         }
+    }
+}
+
+fn drop_enemies(mut commands: Commands, enemies: Query<Entity, With<Enemy>>) {
+    for enemy in enemies.iter() {
+        commands.entity(enemy).despawn_recursive();
     }
 }
