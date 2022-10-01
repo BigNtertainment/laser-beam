@@ -16,8 +16,8 @@ fn main() {
         .insert_resource(Msaa { samples: 1 })
         .insert_resource(ClearColor(Color::rgb(0.4, 0.4, 0.4)))
         .insert_resource(WindowDescriptor {
-            width: 800.,
-            height: 600.,
+            width: 1280.,
+            height: 720.,
             title: TITLE.to_string(),
             canvas: Some("#bevy".to_owned()),
             ..Default::default()

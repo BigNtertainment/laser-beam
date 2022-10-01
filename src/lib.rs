@@ -2,6 +2,7 @@ mod actions;
 mod audio;
 mod camera;
 mod debug;
+mod game_area;
 mod loading;
 mod menu;
 mod player;
@@ -10,6 +11,7 @@ use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
+use crate::game_area::GameAreaPlugin;
 use crate::player::PlayerPlugin;
 
 use bevy::app::App;
@@ -22,13 +24,14 @@ use debug::DebugPlugin;
 pub const GAME_AREA_WIDTH: f32 = 1000.0;
 pub const GAME_AREA_HEIGHT: f32 = 800.0;
 
-pub const WALL_SIZE: f32 = 1.0;
+pub const WALL_WIDTH: f32 = 25.0;
+pub const WALL_HEIGHT: f32 = 25.0;
 
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
 // Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs
 #[derive(Clone, Eq, PartialEq, Debug, Hash)]
-enum GameState {
+pub enum GameState {
     // During the loading State the LoadingPlugin will load our assets
     Loading,
     // During this State the actual game logic is executed
@@ -48,6 +51,7 @@ impl Plugin for GamePlugin {
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(CameraPlugin)
+            .add_plugin(GameAreaPlugin)
             .add_plugin(PlayerPlugin);
 
         #[cfg(debug_assertions)]
