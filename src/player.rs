@@ -5,7 +5,6 @@ use crate::loading::TextureAssets;
 use crate::GameState;
 use crate::{WALL_HEIGHT, WALL_WIDTH};
 use bevy::prelude::*;
-use bevy_prototype_debug_lines::DebugLines;
 
 use crate::GAME_AREA_HEIGHT;
 use crate::GAME_AREA_WIDTH;
@@ -66,7 +65,6 @@ fn move_player(
     actions: Res<Actions>,
     mut player_query: Query<(&mut Transform, &Handle<Image>, &Movement), With<Player>>,
     images: Res<Assets<Image>>,
-    mut lines: ResMut<DebugLines>,
 ) {
     if actions.player_movement.is_none() {
         return;
@@ -95,35 +93,6 @@ fn move_player(
         );
 
         let bounding_box = Vec2::new(game_area.x - player_size.x, game_area.y - player_size.y);
-
-        lines.line(
-            (Vec2::new(1., 1.) * game_area / 2.).extend(0.0),
-            (Vec2::new(1., -1.) * game_area / 2.).extend(0.0),
-            0.,
-        );
-        lines.line(
-            (Vec2::new(1., -1.) * game_area / 2.).extend(0.0),
-            (Vec2::new(-1., -1.) * game_area / 2.).extend(0.0),
-            0.,
-        );
-
-        lines.line(
-            (Vec2::new(-1., -1.) * game_area / 2.).extend(0.0),
-            (Vec2::new(-1., 1.) * game_area / 2.).extend(0.0),
-            0.,
-        );
-
-        lines.line(
-            (Vec2::new(-1., 1.) * game_area / 2.).extend(0.0),
-            (Vec2::new(1., 1.) * game_area / 2.).extend(0.0),
-            0.,
-        );
-
-        lines.line(
-            (Vec2::new(0., 1.) * game_area / 2.).extend(0.0),
-            (Vec2::new(0., 1.) * game_area / 2.).extend(0.0) + Vec3::new(0., WALL_HEIGHT, 0.),
-            0.,
-        );
 
         player_transform.translation.x = player_transform
             .translation

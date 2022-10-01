@@ -23,7 +23,7 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
 
     // Spawn the walls at the top and bottom
     for i in
-        -(GAME_AREA_WIDTH / WALL_WIDTH) as i32 / 2..(GAME_AREA_WIDTH / WALL_WIDTH) as i32 / 2 + 1
+        -(GAME_AREA_WIDTH / WALL_WIDTH) as i32 / 2..(GAME_AREA_WIDTH / WALL_WIDTH) as i32 / 2
     {
         // Top wall
         walls.push(
@@ -32,7 +32,7 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
                     texture: wall_texture.clone(),
                     transform: Transform {
                         translation: Vec3::new(
-                            i as f32 * WALL_WIDTH,
+                            (i as f32 + 0.5) * WALL_WIDTH,
                             (GAME_AREA_HEIGHT - WALL_HEIGHT) / 2.,
                             0.,
                         ),
@@ -51,7 +51,7 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
                     texture: wall_texture.clone(),
                     transform: Transform {
                         translation: Vec3::new(
-                            i as f32 * WALL_WIDTH,
+                            (i as f32 + 0.5) * WALL_WIDTH,
                             -(GAME_AREA_HEIGHT - WALL_HEIGHT) / 2.,
                             0.,
                         ),
