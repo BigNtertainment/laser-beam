@@ -1,3 +1,4 @@
+
 use bevy::prelude::*;
 
 use crate::{character::Health, player::Player, GameState};
@@ -24,7 +25,7 @@ fn overlay(mut commands: Commands) {
             style: Style {
                 size: Size::new(Val::Percent(100.), Val::Percent(100.)),
                 flex_direction: FlexDirection::ColumnReverse,
-                justify_content: JustifyContent::FlexEnd,
+                justify_content: JustifyContent::FlexStart,
                 padding: UiRect::all(Val::Px(20.)),
                 ..default()
             },
@@ -35,10 +36,11 @@ fn overlay(mut commands: Commands) {
             parent
                 .spawn_bundle(NodeBundle {
                     style: Style {
-                        size: Size::new(Val::Percent(50.), Val::Px(25.)),
+                        size: Size::new(Val::Percent(35.), Val::Px(25.)),
+                        padding: UiRect::all(Val::Px(5.)),
                         ..default()
                     },
-                    color: Color::RED.into(),
+                    color: Color::BLACK.into(),
                     ..default()
                 })
                 .with_children(|parent| {
@@ -48,7 +50,7 @@ fn overlay(mut commands: Commands) {
                                 size: Size::new(Val::Percent(100.), Val::Percent(100.)),
                                 ..default()
                             },
-                            color: Color::GREEN.into(),
+                            color: Color::RED.into(),
                             ..default()
                         })
                         .insert(HealthBar);
@@ -60,12 +62,20 @@ fn overlay(mut commands: Commands) {
 fn health_bar_update(
     player_query: Query<&Health, With<Player>>,
     mut health_bar_query: Query<&mut Style, With<HealthBar>>,
+    time: Res<Time>,
 ) {
     let player_health = player_query.single();
     let mut health_bar_style = health_bar_query.single_mut();
 
-    health_bar_style.size.width =
-        Val::Percent((player_health.get_health() / player_health.get_max_health()) * 100.);
+    let rate = 6. * time.delta_seconds();
+
+    let target = (player_health.get_health() / player_health.get_max_health()) * 100.;
+    let mut current = match health_bar_style.size.width {
+        Val::Percent(val) => val,
+        _ => panic!("health bar width not in percent")
+    };
+    current += (target - current) * rate;
+    health_bar_style.size.width = Val::Percent(current);
 }
 
 fn clean_health_bar(

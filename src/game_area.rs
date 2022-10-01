@@ -8,7 +8,8 @@ pub struct GameAreaPlugin;
 
 impl Plugin for GameAreaPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(wall_setup)).add_system_set(SystemSet::on_exit(GameState::Playing).with_system(drop_game_area));
+        app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(wall_setup))
+            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(drop_game_area));
     }
 }
 
