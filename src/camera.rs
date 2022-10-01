@@ -1,5 +1,8 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 
+#[derive(Component)]
+pub struct MainCamera;
+
 pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
@@ -16,7 +19,7 @@ fn camera_setup(mut commands: Commands) {
                 ..Default::default()
             },
             projection: OrthographicProjection {
-                scale: 1.0,
+                scale: 1.,
                 scaling_mode: ScalingMode::Auto {
                     min_width: 960.,
                     min_height: 480.,
@@ -25,5 +28,6 @@ fn camera_setup(mut commands: Commands) {
             },
             ..Default::default()
         })
-        .insert(Name::new("Camera"));
+        .insert(Name::new("Camera"))
+        .insert(MainCamera);
 }
