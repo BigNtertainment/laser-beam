@@ -1,6 +1,7 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 
-use crate::{GAME_AREA_WIDTH, WALL_WIDTH, WALL_HEIGHT, GAME_AREA_HEIGHT};
+#[derive(Component)]
+pub struct MainCamera;
 
 pub struct CameraPlugin;
 
@@ -17,11 +18,15 @@ fn camera_setup(mut commands: Commands) {
                 priority: 1,
                 ..Default::default()
             },
-			projection: OrthographicProjection {
-				scaling_mode: ScalingMode::Auto { min_width: (GAME_AREA_WIDTH + 2. * WALL_WIDTH) / 2., min_height: (GAME_AREA_HEIGHT + 2. * WALL_HEIGHT) / 2. },
-				..Default::default()
-			},
-			..Default::default()
-		})
-        .insert(Name::new("Camera"));
+            projection: OrthographicProjection {
+                scaling_mode: ScalingMode::Auto {
+                    min_width: 960.,
+                    min_height: 480.,
+                },
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(Name::new("Camera"))
+        .insert(MainCamera);
 }
