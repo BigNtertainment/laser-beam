@@ -48,22 +48,23 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
     commands.spawn_bundle(PlayerBundle {
         sprite_budle: SpriteBundle {
             texture: textures.texture_bevy.clone(),
-            transform: Transform::from_translation(Vec3::new(0., 0., 1.))
-                .with_scale(Vec3::new(0.5, 0.5, 1.0)),
-            ..Default::default()
+            transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
+            ..default()
         },
         name: Name::new("Player"),
         player: Player,
         health: Health::new(100.0),
         movement: Movement { speed: 100. },
-        rotation: Rotation { rotation_speed: 1.5 },
+        rotation: Rotation {
+            rotation_speed: 1.5,
+        },
     });
 }
 
 fn move_player(
     time: Res<Time>,
     actions: Res<Actions>,
-    mut player_query: Query<(&mut Transform, &Handle<Image>, &Movement)>,
+    mut player_query: Query<(&mut Transform, &Handle<Image>, &Movement), With<Player>>,
     images: Res<Assets<Image>>,
     mut lines: ResMut<DebugLines>,
 ) {

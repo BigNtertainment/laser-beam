@@ -3,6 +3,7 @@ mod audio;
 mod camera;
 mod character;
 mod debug;
+mod enemy;
 mod game_area;
 mod game_over;
 mod laser;
@@ -12,6 +13,7 @@ mod player;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
+use crate::enemy::EnemyPlugin;
 use crate::game_area::GameAreaPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
@@ -63,7 +65,8 @@ impl Plugin for GamePlugin {
             .add_plugin(GameAreaPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(HealthPlugin)
-            .add_plugin(LaserPlugin);
+            .add_plugin(LaserPlugin)
+            .add_plugin(EnemyPlugin);
 
         #[cfg(debug_assertions)]
         {
