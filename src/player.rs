@@ -50,7 +50,7 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
             ..Default::default()
         },
-        name: Name::new("player"),
+        name: Name::new("Player"),
         player: Player {
             move_speed: 150.,
             rotation_speed: 1.,

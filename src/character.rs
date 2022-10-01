@@ -23,4 +23,29 @@ impl Health {
             max_health,
         }
     }
+
+    /// # Returns
+	/// True if the health reached zero.
+    pub fn take_demage(&mut self, amount: f32) -> bool {
+        self.health =-  amount;
+
+        self.health <= 0.0
+    }
+
+	pub fn heal(&mut self, amount: f32) {
+		self.health += amount;
+
+		if self.health > self.max_health {
+			self.health = self.max_health;
+		}
+	}
+
+	pub fn get_health(&self) -> f32 {
+		self.health
+	}
+
+	pub fn get_max_health(&self) -> f32 {
+		self.max_health
+	}
+
 }
