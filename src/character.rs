@@ -1,4 +1,4 @@
-use bevy::{prelude::*};
+use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
 
 pub struct HealthPlugin;
@@ -27,29 +27,28 @@ impl Health {
     /// # Returns
 	/// True if the health reached zero.
     #[allow(unused)]
-    pub fn take_demage(&mut self, amount: f32) -> bool {
-        self.health =-  amount;
+    pub fn take_damage(&mut self, amount: f32) -> bool {
+        self.health -= amount;
 
         self.health <= 0.0
     }
 
     #[allow(unused)]
-	pub fn heal(&mut self, amount: f32) {
-		self.health += amount;
+    pub fn heal(&mut self, amount: f32) {
+        self.health += amount;
 
-		if self.health > self.max_health {
-			self.health = self.max_health;
-		}
-	}
-
-    #[allow(unused)]
-	pub fn get_health(&self) -> f32 {
-		self.health
-	}
+        if self.health > self.max_health {
+            self.health = self.max_health;
+        }
+    }
 
     #[allow(unused)]
-	pub fn get_max_health(&self) -> f32 {
-		self.max_health
-	}
+    pub fn get_health(&self) -> f32 {
+        self.health
+    }
 
+    #[allow(unused)]
+    pub fn get_max_health(&self) -> f32 {
+        self.max_health
+    }
 }

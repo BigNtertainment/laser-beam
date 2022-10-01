@@ -4,6 +4,8 @@ mod camera;
 mod character;
 mod debug;
 mod game_area;
+mod game_over;
+mod laser;
 mod loading;
 mod menu;
 mod player;
@@ -22,6 +24,8 @@ use bevy::prelude::*;
 use camera::CameraPlugin;
 use character::HealthPlugin;
 use debug::DebugPlugin;
+use game_over::GameOver;
+use laser::LaserPlugin;
 
 pub const GAME_AREA_WIDTH: f32 = 1000.0;
 pub const GAME_AREA_HEIGHT: f32 = 800.0;
@@ -40,6 +44,8 @@ pub enum GameState {
     Playing,
     // Here the menu is drawn and waiting for player interaction
     Menu,
+    // Game over screen ¯\_(ツ)_/¯
+    GameOver,
 }
 
 pub struct GamePlugin;
@@ -50,12 +56,14 @@ impl Plugin for GamePlugin {
             .add_plugin(DebugPlugin)
             .add_plugin(LoadingPlugin)
             .add_plugin(MenuPlugin)
+            .add_plugin(GameOver)
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(CameraPlugin)
             .add_plugin(GameAreaPlugin)
             .add_plugin(PlayerPlugin)
-            .add_plugin(HealthPlugin);
+            .add_plugin(HealthPlugin)
+            .add_plugin(LaserPlugin);
 
         #[cfg(debug_assertions)]
         {

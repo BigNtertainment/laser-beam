@@ -38,7 +38,12 @@ impl Plugin for PlayerPlugin {
                 SystemSet::on_update(GameState::Playing)
                     .with_system(move_player.label("player_movement"))
                     .with_system(aim_player.after("player_movement"))
-                    .with_system(camera_follow.after("player_movement")),
+                    .with_system(camera_follow.after("player_movement"))
+                    .with_system(check_if_dead),
+            )
+            .add_system_set(
+                SystemSet::on_exit(GameState::Playing)
+                .with_system(drop_player),
             );
     }
 }
@@ -107,11 +112,13 @@ fn move_player(
             (Vec2::new(-1., -1.) * game_area / 2.).extend(0.0),
             0.,
         );
+
         lines.line(
             (Vec2::new(-1., -1.) * game_area / 2.).extend(0.0),
             (Vec2::new(-1., 1.) * game_area / 2.).extend(0.0),
             0.,
         );
+
         lines.line(
             (Vec2::new(-1., 1.) * game_area / 2.).extend(0.0),
             (Vec2::new(1., 1.) * game_area / 2.).extend(0.0),
@@ -128,6 +135,7 @@ fn move_player(
             .translation
             .x
             .clamp(-bounding_box.x / 2.0, bounding_box.x / 2.0);
+
         player_transform.translation.y = player_transform
             .translation
             .y
@@ -197,6 +205,18 @@ fn aim_player(
             }
         }
     }
+}
+
+fn check_if_dead(player: Query<&Health, With<Player>>, mut state: ResMut<State<GameState>>) {
+    let player = player.single();
+
+    if player.get_health() <= 0.0 {
+        state.set(GameState::GameOver).unwrap();
+    }
+}
+
+fn drop_player(mut commands: Commands, player: Query<Entity, With<Player>>) {
+    commands.entity(player.single()).despawn_recursive();
 }
 
 fn camera_follow(
