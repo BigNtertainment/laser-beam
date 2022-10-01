@@ -29,6 +29,7 @@ impl Health {
     /// # Returns
     /// True if the health reached zero.
     #[allow(unused)]
+    #[deny(unused_results)]
     pub fn take_damage(&mut self, amount: f32) -> bool {
         self.health -= amount;
 
