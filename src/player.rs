@@ -214,38 +214,16 @@ fn drop_player(mut commands: Commands, player: Query<Entity, With<Player>>) {
 
 fn camera_follow(
     player: Query<&Transform, With<Player>>,
-    mut camera: Query<(&mut Transform, &Camera), Without<Player>>,
-    mut lines: ResMut<DebugLines>,
+    mut camera: Query<&mut Transform, (With<Camera>, Without<Player>)>,
+    windows: Res<Windows>,
 ) {
     let player = player.single();
-    let (mut camera_transform, camera) = camera.iter_mut().next().unwrap();
-
-    let viewport = camera.logical_viewport_size().unwrap();
+    let mut camera_transform = camera.iter_mut().next().unwrap();
+    let window = windows.primary();
 
     let bounding_box = Vec2::new(
-        GAME_AREA_WIDTH - viewport.x as f32 / 2.,
-        GAME_AREA_HEIGHT - viewport.y as f32 / 2.,
-    );
-
-    lines.line(
-        (Vec2::new(1., 1.) * bounding_box / 2.).extend(0.0),
-        (Vec2::new(1., -1.) * bounding_box / 2.).extend(0.0),
-        0.,
-    );
-    lines.line(
-        (Vec2::new(1., -1.) * bounding_box / 2.).extend(0.0),
-        (Vec2::new(-1., -1.) * bounding_box / 2.).extend(0.0),
-        0.,
-    );
-    lines.line(
-        (Vec2::new(-1., -1.) * bounding_box / 2.).extend(0.0),
-        (Vec2::new(-1., 1.) * bounding_box / 2.).extend(0.0),
-        0.,
-    );
-    lines.line(
-        (Vec2::new(-1., 1.) * bounding_box / 2.).extend(0.0),
-        (Vec2::new(1., 1.) * bounding_box / 2.).extend(0.0),
-        0.,
+        GAME_AREA_WIDTH - window.width(),
+        GAME_AREA_HEIGHT - window.height(),
     );
 
     camera_transform.translation.x = if bounding_box.x >= 0. {

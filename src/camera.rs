@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::camera::ScalingMode};
+use bevy::prelude::*;
 
 #[derive(Component)]
 pub struct MainCamera;
@@ -16,13 +16,6 @@ fn camera_setup(mut commands: Commands) {
         .spawn_bundle(Camera2dBundle {
             camera: Camera {
                 priority: 1,
-                ..Default::default()
-            },
-            projection: OrthographicProjection {
-                scaling_mode: ScalingMode::Auto {
-                    min_width: 960.,
-                    min_height: 480.,
-                },
                 ..Default::default()
             },
             ..Default::default()

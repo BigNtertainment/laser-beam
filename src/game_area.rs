@@ -18,15 +18,18 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
     let mut walls = Vec::new();
 
     // Spawn the walls at the top and bottom
-    for i in -(GAME_AREA_WIDTH / WALL_WIDTH) as i32 / 2..(GAME_AREA_WIDTH / WALL_WIDTH) as i32 / 2 {
+    for i in
+        -(GAME_AREA_WIDTH / WALL_WIDTH) as i32 / 2..(GAME_AREA_WIDTH / WALL_WIDTH) as i32 / 2 + 1
+    {
+        // Top wall
         walls.push(
             commands
                 .spawn_bundle(SpriteBundle {
                     texture: wall_texture.clone(),
                     transform: Transform {
                         translation: Vec3::new(
-                            (i as f32 + 0.5) * WALL_WIDTH,
-                            -(GAME_AREA_HEIGHT - WALL_HEIGHT) / 2.,
+                            i as f32 * WALL_WIDTH,
+                            (GAME_AREA_HEIGHT - WALL_HEIGHT) / 2.,
                             0.,
                         ),
                         ..Default::default()
@@ -37,14 +40,15 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
                 .id(),
         );
 
+        // Bottom wall
         walls.push(
             commands
                 .spawn_bundle(SpriteBundle {
                     texture: wall_texture.clone(),
                     transform: Transform {
                         translation: Vec3::new(
-                            (i as f32 + 0.5) * WALL_WIDTH,
-                            (GAME_AREA_HEIGHT - WALL_HEIGHT) / 2.,
+                            i as f32 * WALL_WIDTH,
+                            -(GAME_AREA_HEIGHT - WALL_HEIGHT) / 2.,
                             0.,
                         ),
                         ..Default::default()
@@ -57,7 +61,7 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
     }
 
     // Spawn the left and right walls
-    for i in -(GAME_AREA_HEIGHT / WALL_HEIGHT + 1.) as i32 / 2
+    for i in -(GAME_AREA_HEIGHT / WALL_HEIGHT - 1.) as i32 / 2
         ..(GAME_AREA_HEIGHT / WALL_HEIGHT - 1.) as i32 / 2
     {
         walls.push(

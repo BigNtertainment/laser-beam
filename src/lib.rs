@@ -27,8 +27,8 @@ use debug::DebugPlugin;
 use game_over::GameOver;
 use laser::LaserPlugin;
 
-pub const GAME_AREA_WIDTH: f32 = 1000.0;
-pub const GAME_AREA_HEIGHT: f32 = 800.0;
+pub const GAME_AREA_WIDTH: f32 = 1775.0;
+pub const GAME_AREA_HEIGHT: f32 = 1000.0;
 
 pub const WALL_WIDTH: f32 = 25.0;
 pub const WALL_HEIGHT: f32 = 25.0;
