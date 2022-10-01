@@ -15,12 +15,15 @@ fn camera_setup(mut commands: Commands) {
                 priority: 1,
                 ..Default::default()
             },
-			projection: OrthographicProjection {
+            projection: OrthographicProjection {
                 scale: 1.0,
-				scaling_mode: ScalingMode::Auto { min_width: 960., min_height: 480. },
-				..Default::default()
-			},
-			..Default::default()
-		})
+                scaling_mode: ScalingMode::Auto {
+                    min_width: 960.,
+                    min_height: 480.,
+                },
+                ..Default::default()
+            },
+            ..Default::default()
+        })
         .insert(Name::new("Camera"));
 }

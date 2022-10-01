@@ -1,6 +1,7 @@
 mod actions;
 mod audio;
 mod camera;
+mod character;
 mod debug;
 mod loading;
 mod menu;
