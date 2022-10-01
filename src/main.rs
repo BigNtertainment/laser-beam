@@ -9,7 +9,7 @@ use bevy_game::GamePlugin;
 use std::io::Cursor;
 use winit::window::Icon;
 
-const TITLE: &str = "LASER BEAM!";
+pub const TITLE: &str = "LASER BEAM!";
 
 fn main() {
     App::new()

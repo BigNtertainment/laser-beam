@@ -19,6 +19,9 @@ use bevy::prelude::*;
 use camera::CameraPlugin;
 use debug::DebugPlugin;
 
+pub const GAME_AREA_WIDTH: f32 = 1000.0;
+pub const GAME_AREA_HEIGHT: f32 = 800.0;
+
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
 // Or https://github.com/bevyengine/bevy/blob/main/examples/ecs/state.rs

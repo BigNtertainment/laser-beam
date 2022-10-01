@@ -3,6 +3,9 @@ use crate::loading::TextureAssets;
 use crate::GameState;
 use bevy::prelude::*;
 
+use crate::GAME_AREA_WIDTH;
+use crate::GAME_AREA_HEIGHT;
+
 pub struct PlayerPlugin;
 
 #[derive(Component)]
@@ -58,6 +61,6 @@ fn camera_follow(
     let player = player.single();
     let mut camera = camera.iter_mut().next().unwrap();
 
-    camera.translation.x = player.translation.x;
-    camera.translation.y = player.translation.y;
+    camera.translation.x = player.translation.x.clamp(-GAME_AREA_WIDTH / 2.0, GAME_AREA_WIDTH / 2.0);
+    camera.translation.y = player.translation.y.clamp(-GAME_AREA_HEIGHT / 2.0, GAME_AREA_HEIGHT / 2.0);
 }
