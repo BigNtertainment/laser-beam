@@ -173,7 +173,7 @@ fn take_damage(
                     // TODO: Maybe change it from a hard-coded value to a component
                     if health.take_damage(50.) {
                         commands.entity(enemy_entity).despawn_recursive();
-                        score.0 += 1;
+                        score.0 += 100;
                     }
 
                     info!("remaining_health={:?}", health.get_health());
