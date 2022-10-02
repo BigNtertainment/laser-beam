@@ -141,6 +141,7 @@ fn spawn_enemies(
             texture: textures.enemy_texture.clone(),
             transform: Transform {
                 translation: position.extend(0.),
+                scale: Vec3::new(0.25, 0.25, 1.),
                 ..default()
             },
             ..default()
