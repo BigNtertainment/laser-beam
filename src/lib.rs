@@ -10,6 +10,7 @@ mod health_bar;
 mod loading;
 mod menu;
 mod player;
+mod shaders;
 mod weapon;
 
 use crate::actions::ActionsPlugin;
@@ -30,6 +31,7 @@ use camera::CameraPlugin;
 use character::HealthPlugin;
 use debug::DebugPlugin;
 use game_over::GameOver;
+use shaders::ShaderPlugin;
 use weapon::WeaponPlugin;
 
 pub const GAME_AREA_WIDTH: f32 = 1000.0;
@@ -63,6 +65,7 @@ impl Plugin for GamePlugin {
             .add_plugin(LoadingPlugin)
             .add_plugin(MenuPlugin)
             .add_plugin(GameOver)
+            .add_plugin(ShaderPlugin)
             .add_plugin(ActionsPlugin)
             .add_plugin(InternalAudioPlugin)
             .add_plugin(CameraPlugin)

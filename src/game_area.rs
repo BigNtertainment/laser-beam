@@ -151,8 +151,6 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
             Wall::Right => Vec2::NEG_X,
         });
 
-        println!("enemy spawn at {:?}", translation);
-
         let is_enemy_spawn = match get_wall_tile(position, &face, &enemy_spawns) {
             WallTile::Wall => false,
             WallTile::EnemySpawn => true,
