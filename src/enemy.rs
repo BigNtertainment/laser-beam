@@ -17,7 +17,7 @@ pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(EnemySpawnTimer(Timer::from_seconds(7., false)))
+        app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(enemy_spawn_setup))
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
                     .with_system(hit_player)
@@ -25,7 +25,7 @@ impl Plugin for EnemyPlugin {
                     .with_system(follow_player)
                     .with_system(take_damage),
             )
-            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(drop_enemies));
+            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(enemy_spawn_cleanup).with_system(drop_enemies));
     }
 }
 
@@ -41,6 +41,7 @@ struct HitTimer(Timer);
 #[derive(Deref, DerefMut)]
 struct EnemySpawnTimer(Timer);
 
+pub const ENEMY_SPAWN_TIME_DEFAULT: f32 = 7.;
 pub const ENEMY_SPAWN_TIME_INCREASE_RATE: f32 = 0.95;
 pub const ENEMY_SPAWN_TIME_MINIMUM: f32 = 0.5;
 
@@ -52,6 +53,7 @@ pub struct EnemyBundle {
     attack_timer: AttackTimer,
     hit_timer: HitTimer,
     collider: Collider,
+    name: Name,
     #[bundle]
     sprite: SpriteBundle,
 }
@@ -65,6 +67,7 @@ impl Default for EnemyBundle {
             collider: Collider::cuboid(32., 32.),
             attack_timer: AttackTimer(Timer::from_seconds(2., false)),
             hit_timer: HitTimer(Timer::from_seconds(0.5, false)),
+            name: Name::new("Enemy"),
             sprite: SpriteBundle::default(),
         }
     }
@@ -98,6 +101,10 @@ fn follow_player(
                 * if !hit_timer.finished() { 0.5 } else { 1. };
         }
     }
+}
+
+fn enemy_spawn_setup(mut commands: Commands) {
+    commands.insert_resource(EnemySpawnTimer(Timer::from_seconds(ENEMY_SPAWN_TIME_DEFAULT, false)));
 }
 
 fn spawn_enemies(
@@ -142,16 +149,22 @@ fn spawn_enemies(
     });
 }
 
+fn enemy_spawn_cleanup(mut commands: Commands) {
+    commands.remove_resource::<EnemySpawnTimer>();
+}
+
 fn take_damage(
     mut commands: Commands,
     mut enemies: Query<(Entity, &mut HitTimer, &mut Health), With<Enemy>>,
     mut entity_hit_event_reader: EventReader<EntityHitEvent>,
     time: Res<Time>,
 ) {
+    let entity_hits = entity_hit_event_reader.iter().collect::<Vec<_>>();
+
     for (enemy_entity, mut hit_timer, mut health) in enemies.iter_mut() {
         hit_timer.tick(time.delta());
 
-        for hit in entity_hit_event_reader.iter() {
+        for hit in &entity_hits {
             if enemy_entity.id() == hit.0.id() {
                 if hit_timer.finished() {
                     // TODO: Maybe change it from a hard-coded value to a component
