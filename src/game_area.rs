@@ -65,9 +65,7 @@ impl Distribution<EnemySpawnPoint> for Standard {
 }
 
 #[derive(Component)]
-pub struct EnemySpawn {
-    wall: Wall,
-}
+pub struct EnemySpawn;
 
 #[derive(PartialEq)]
 enum WallTile {
@@ -161,13 +159,6 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
             WallTile::Empty => return commands.spawn().insert(Name::new("Nothing :(")).id(),
         };
 
-        let enemy_spawn_point = EnemySpawnPoint {
-            wall: face,
-            position,
-        };
-
-        let face = enemy_spawn_point.wall;
-
         let mut wall = commands.spawn_bundle(SpriteBundle {
             texture: if is_enemy_spawn {
                 enemy_spawn_texture.clone()
@@ -189,7 +180,7 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
         }));
 
         if is_enemy_spawn {
-            wall.insert(EnemySpawn { wall: face });
+            wall.insert(EnemySpawn);
         }
 
         wall.id()
