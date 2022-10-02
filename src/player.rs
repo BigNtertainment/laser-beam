@@ -49,7 +49,7 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
         .spawn_bundle(PlayerBundle {
             sprite_budle: SpriteBundle {
                 texture: textures.texture_bevy.clone(),
-                transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
+                transform: Transform::from_translation(Vec3::new(0., 0., 1.)).with_scale(Vec3::new(0.2, -0.2, 1.)),
                 ..default()
             },
             name: Name::new("Player"),
@@ -90,8 +90,8 @@ fn move_player(
         let texture_size = images.get(texture).unwrap().texture_descriptor.size;
 
         let player_size = Vec2::new(
-            texture_size.width as f32 * player_transform.scale.x,
-            texture_size.height as f32 * player_transform.scale.y,
+            texture_size.width as f32 * player_transform.scale.x.abs(),
+            texture_size.height as f32 * player_transform.scale.y.abs(),
         );
 
         let game_area = Vec2::new(
