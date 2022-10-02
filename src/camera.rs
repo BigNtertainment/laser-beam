@@ -5,7 +5,7 @@ use bevy::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
         texture::BevyDefault,
-        view::RenderLayers,
+        view::RenderLayers, camera::RenderTarget,
     }, sprite::{Material2d, MaterialMesh2dBundle},
 };
 
@@ -74,6 +74,7 @@ fn camera_setup(
     commands
         .spawn_bundle(Camera2dBundle {
             camera: Camera {
+				target: RenderTarget::Image(image_handle.clone()),
                 priority: 0,
                 ..Default::default()
             },
@@ -149,17 +150,4 @@ fn set_post_processing_effects<M: Material2d>(
 		.insert(Screen).id();
 
 	commands.insert_resource(ScreenRes(screen));
-}
-
-pub fn update_post_processing_effects<M: Material2d>(
-	commands: &mut Commands,
-	screen: &Entity,
-	material: Handle<M>,
-    windows: &Res<Windows>,
-	meshes: &mut ResMut<Assets<Mesh>>,
-	post_processing_pass_layer: &PostProcessingLayer,
-) {
-	commands.entity(*screen).despawn_recursive();
-
-	set_post_processing_effects(commands, material, windows, meshes, post_processing_pass_layer);
 }

@@ -2,20 +2,15 @@ use crate::actions::Actions;
 use crate::camera::MainCamera;
 use crate::character::{Health, Movement, Rotation};
 use crate::loading::TextureAssets;
-use crate::shaders::pixelise::PixeliseMaterial;
 use crate::weapon::{Weapon, WeaponBundle};
 use crate::GameState;
 use crate::{WALL_HEIGHT, WALL_WIDTH};
 use bevy::prelude::*;
-use bevy::sprite::MaterialMesh2dBundle;
 
 use crate::GAME_AREA_HEIGHT;
 use crate::GAME_AREA_WIDTH;
 use bevy::math::Vec3Swizzles;
 use std::f32::consts::PI;
-
-pub const PLAYER_WIDTH: f32 = 230.;
-pub const PLAYER_HEIGHT: f32 = 230.;
 
 pub struct PlayerPlugin;
 
@@ -25,7 +20,7 @@ pub struct Player;
 #[derive(Bundle)]
 pub struct PlayerBundle {
     #[bundle]
-    material_mesh_2d_bundle: MaterialMesh2dBundle<PixeliseMaterial>,
+    sprite_bundle: SpriteBundle,
     name: Name,
     player: Player,
     health: Health,
@@ -52,23 +47,13 @@ impl Plugin for PlayerPlugin {
 fn spawn_player(
     mut commands: Commands,
     textures: Res<TextureAssets>,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut pixelise_materials: ResMut<Assets<PixeliseMaterial>>,
 ) {
-    let quad_handle = meshes.add(Mesh::from(shape::Quad::new(Vec2::new(
-        PLAYER_WIDTH as f32,
-        PLAYER_HEIGHT as f32,
-    ))));
-
     commands
         .spawn_bundle(PlayerBundle {
-            material_mesh_2d_bundle: MaterialMesh2dBundle {
-                mesh: quad_handle.into(),
-                material: pixelise_materials.add(PixeliseMaterial {
-                    source_image: textures.player_texture.clone(),
-                }),
+            sprite_bundle: SpriteBundle {
+                texture: textures.player_texture.clone(),
                 transform: Transform::from_translation(Vec3::new(0., 0., 1.))
-                    .with_scale(Vec3::new(0.5, 0.5, 1.)),
+                    .with_scale(Vec3::new(0.25, -0.25, 1.)),
                 ..default()
             },
             name: Name::new("Player"),
@@ -89,13 +74,14 @@ fn spawn_player(
 fn move_player(
     time: Res<Time>,
     actions: Res<Actions>,
-    mut player_query: Query<(&mut Transform, &Movement), With<Player>>,
+    mut player_query: Query<(&mut Transform, &Handle<Image>, &Movement), With<Player>>,
+    images: Res<Assets<Image>>,
 ) {
     if actions.player_movement.is_none() {
         return;
     }
 
-    for (mut player_transform, player_movement) in &mut player_query {
+    for (mut player_transform, texture, player_movement) in &mut player_query {
         let movement = Vec3::new(
             actions.player_movement.unwrap().x * player_movement.speed * time.delta_seconds(),
             actions.player_movement.unwrap().y * player_movement.speed * time.delta_seconds(),
@@ -105,9 +91,11 @@ fn move_player(
         player_transform.translation += movement;
 
         // Keep the player in the game area
+        let texture_size = images.get(texture).unwrap().texture_descriptor.size;
+
         let player_size = Vec2::new(
-            PLAYER_WIDTH * player_transform.scale.x.abs(),
-            PLAYER_HEIGHT as f32 * player_transform.scale.y.abs(),
+            texture_size.width as f32 * player_transform.scale.x.abs(),
+            texture_size.height as f32 as f32 * player_transform.scale.y.abs(),
         );
 
         let game_area = Vec2::new(
