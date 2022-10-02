@@ -7,6 +7,7 @@ use crate::{
 };
 use bevy::math::Vec3Swizzles;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
+use bevy_prototype_debug_lines::DebugLines;
 use pathfinding::prelude::{astar, Grid};
 
 pub struct EnemyPlugin;
@@ -87,7 +88,21 @@ fn follow_player(
             // Calculate the path and save it in cache
             let path = astar(
                 &enemy_square,
-                |p| grid.neighbours(*p).into_iter().map(|p| (p, 1)),
+                |p| {
+                    let neighbours = grid.neighbours(*p);
+                    
+                    let neighbours_iter = neighbours.into_iter();
+                    
+                    let result = neighbours_iter.map(|neighbour| {
+                        if (neighbour.0 as f32 - p.0 as f32).abs() > 0. && (neighbour.1 as f32 - p.1 as f32).abs() > 0. {
+                            return (neighbour, 141);
+                        }
+
+                        (neighbour, 100)
+                    }).collect::<Vec<((usize, usize), usize)>>();
+
+                    result
+                },
                 |p| grid.distance(*p, player_square),
                 |p| *p == player_square,
             );
@@ -112,6 +127,7 @@ fn follow_player(
 fn update_enemy_position(
     mut enemies_query: Query<(&mut Transform, &mut PathCache, &Movement), With<Enemy>>,
     time: Res<Time>,
+    mut lines: ResMut<DebugLines>,
 ) {
     for (mut enemy_transform, mut path_cache, movement) in enemies_query.iter_mut() {
         if let Some(path) = path_cache.path.as_ref() {
@@ -120,6 +136,12 @@ fn update_enemy_position(
             let direction_normalized = direction.normalize_or_zero();
 
             let movement_vector = direction_normalized * movement.speed * time.delta_seconds();
+
+            lines.line(
+                enemy_transform.translation,
+                enemy_transform.translation + direction.extend(0.0),
+                0.,
+            );
 
             // If the next goal has been reached
             if direction.length() <= movement_vector.length() {
@@ -145,22 +167,24 @@ fn update_enemy_position(
 }
 
 fn spawn_enemies(mut commands: Commands, textures: Res<TextureAssets>) {
-    commands.spawn_bundle(EnemyBundle {
-        health: Health::new(100.),
-        movement: Movement { speed: 50.0 },
-        enemy: Enemy,
-        attack_timer: AttackTimer(Timer::from_seconds(2., true)),
-        path_cache: PathCache {
-            player_square: (12, 12),
-            path: None,
-            index: 0,
-        },
-        sprite: SpriteBundle {
-            texture: textures.enemy_texture.clone(),
-            transform: Transform::from_translation(Vec3::new(-250., 200., 1.)),
-            ..default()
-        },
-    }).insert(Name::new("Enemy"));
+    commands
+        .spawn_bundle(EnemyBundle {
+            health: Health::new(100.),
+            movement: Movement { speed: 50.0 },
+            enemy: Enemy,
+            attack_timer: AttackTimer(Timer::from_seconds(2., true)),
+            path_cache: PathCache {
+                player_square: (12, 12),
+                path: None,
+                index: 0,
+            },
+            sprite: SpriteBundle {
+                texture: textures.enemy_texture.clone(),
+                transform: Transform::from_translation(Vec3::new(-250., 200., 1.)),
+                ..default()
+            },
+        })
+        .insert(Name::new("Enemy"));
 }
 
 fn hit_player(

@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_prototype_debug_lines::DebugLines;
 use pathfinding::prelude::Grid;
 
 use crate::{
@@ -17,7 +18,7 @@ impl Plugin for GameAreaPlugin {
 #[derive(Component)]
 pub struct GameArea;
 
-fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
+fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>, mut lines: ResMut<DebugLines>) {
     let wall_texture = &textures.wall_texture;
 
     let mut walls = Vec::new();
@@ -104,24 +105,28 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
         );
     }
 
-    let grid_size = ((GAME_AREA_WIDTH / WALL_WIDTH) as usize, (GAME_AREA_HEIGHT / WALL_HEIGHT) as usize);
+    let grid_size = (
+        (GAME_AREA_WIDTH / (WALL_WIDTH / 2.)) as usize,
+        (GAME_AREA_HEIGHT / (WALL_HEIGHT / 2.)) as usize,
+    );
 
     let mut grid = Grid::new(grid_size.0, grid_size.1);
 
     grid.enable_diagonal_mode();
     grid.fill();
 
-    let inner_walls = vec![
-        (5, 5),
-        (6, 5),
-        (7, 5),
-        (5, 6),
-        (6, 6),
-        (7, 6),
-    ];
+    let inner_walls = vec![(15, 5), (16, 5), (17, 5), (15, 6), (16, 6), (17, 6)];
 
     for wall in inner_walls {
-        grid.remove_vertex((wall.0, wall.1));
+        grid.remove_vertex((wall.0 * 2, wall.1 * 2));
+        grid.remove_vertex((wall.0 * 2, wall.1 * 2 - 1));
+        grid.remove_vertex((wall.0 * 2, wall.1 * 2 + 1));
+        grid.remove_vertex((wall.0 * 2 - 1, wall.1 * 2));
+        grid.remove_vertex((wall.0 * 2 + 1, wall.1 * 2));
+        grid.remove_vertex((wall.0 * 2 + 1, wall.1 * 2 + 1));
+        grid.remove_vertex((wall.0 * 2 - 1, wall.1 * 2 - 1));
+        grid.remove_vertex((wall.0 * 2 + 1, wall.1 * 2 - 1));
+        grid.remove_vertex((wall.0 * 2 - 1, wall.1 * 2 + 1));
 
         walls.push(
             commands
@@ -129,8 +134,8 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
                     texture: wall_texture.clone(),
                     transform: Transform {
                         translation: Vec3::new(
-                            wall.0 as f32 * WALL_WIDTH,
-                            wall.1 as f32 * WALL_HEIGHT,
+                            (wall.0) as f32 * WALL_WIDTH - GAME_AREA_WIDTH / 2.,
+                            (wall.1) as f32 * -WALL_HEIGHT + GAME_AREA_HEIGHT / 2.,
                             0.,
                         ),
                         ..Default::default()
@@ -143,6 +148,37 @@ fn wall_setup(mut commands: Commands, textures: Res<TextureAssets>) {
     }
 
     println!("{:?}", grid);
+
+    for i in 0..grid.width {
+        for j in 0..grid.height {
+            if !grid.has_vertex((i, j)) {
+                continue;
+            }
+
+            let world_coords = grid_to_world_coords((i, j));
+
+            lines.line(
+                (world_coords + Vec2::new(0.25, 0.25) * WALL_WIDTH).extend(0.),
+                (world_coords + Vec2::new(-0.25, 0.25) * WALL_WIDTH).extend(0.),
+                30.0,
+            );
+            lines.line(
+                (world_coords + Vec2::new(-0.25, 0.25) * WALL_WIDTH).extend(0.),
+                (world_coords + Vec2::new(-0.25, -0.25) * WALL_WIDTH).extend(0.),
+                30.0,
+            );
+            lines.line(
+                (world_coords + Vec2::new(-0.25, -0.25) * WALL_WIDTH).extend(0.),
+                (world_coords + Vec2::new(0.25, -0.25) * WALL_WIDTH).extend(0.),
+                30.0,
+            );
+            lines.line(
+                (world_coords + Vec2::new(0.25, -0.25) * WALL_WIDTH).extend(0.),
+                (world_coords + Vec2::new(0.25, 0.25) * WALL_WIDTH).extend(0.),
+                30.0,
+            );
+        }
+    }
 
     commands.insert_resource(grid);
 
@@ -166,15 +202,15 @@ fn drop_game_area(mut commands: Commands, game_area: Query<Entity, With<GameArea
 
 pub fn world_to_grid_coords(world: Vec2) -> (usize, usize) {
     (
-        ((GAME_AREA_WIDTH / 2. + world.x) / WALL_WIDTH) as usize,
-        ((GAME_AREA_HEIGHT / 2. - world.y ) / WALL_WIDTH) as usize,
+        ((GAME_AREA_WIDTH / 2. + world.x) / (WALL_WIDTH / 2.)) as usize,
+        ((GAME_AREA_HEIGHT / 2. - world.y) / (WALL_WIDTH / 2.)) as usize,
     )
 }
 
 pub fn grid_to_world_coords(grid: (usize, usize)) -> Vec2 {
     Vec2::new(
-        grid.0 as f32 * WALL_WIDTH - GAME_AREA_WIDTH / 2.,
-        -(grid.1 as f32 * WALL_HEIGHT - GAME_AREA_HEIGHT / 2.),
+        grid.0 as f32 * (WALL_WIDTH / 2.) - GAME_AREA_WIDTH / 2.,
+        -(grid.1 as f32 * (WALL_HEIGHT / 2.) - GAME_AREA_HEIGHT / 2.),
     )
 }
 
@@ -186,9 +222,6 @@ mod tests {
     fn coords_conversion() {
         let coords = (3, 6);
 
-        assert_eq!(
-            world_to_grid_coords(grid_to_world_coords(coords)),
-            coords
-        );
+        assert_eq!(world_to_grid_coords(grid_to_world_coords(coords)), coords);
     }
 }
