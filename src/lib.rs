@@ -10,6 +10,7 @@ mod health_bar;
 mod loading;
 mod menu;
 mod player;
+mod score;
 mod shaders;
 mod weapon;
 
@@ -31,6 +32,7 @@ use camera::CameraPlugin;
 use character::HealthPlugin;
 use debug::DebugPlugin;
 use game_over::GameOver;
+use score::ScorePlugin;
 use shaders::ShaderPlugin;
 use weapon::WeaponPlugin;
 
@@ -72,6 +74,7 @@ impl Plugin for GamePlugin {
             .add_plugin(GameAreaPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(HealthPlugin)
+            .add_plugin(ScorePlugin)
             .add_plugin(WeaponPlugin)
             .add_plugin(HealthBarPlugin)
             .add_plugin(EnemyPlugin);

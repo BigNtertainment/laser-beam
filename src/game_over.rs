@@ -1,4 +1,5 @@
 use crate::loading::FontAssets;
+use crate::score::Score;
 use crate::GameState;
 use bevy::prelude::*;
 
@@ -16,6 +17,9 @@ impl Plugin for GameOver {
             .add_system_set(SystemSet::on_exit(GameState::GameOver).with_system(cleanup_menu));
     }
 }
+
+#[derive(Component)]
+struct GameOverMenu;
 
 struct ButtonColors {
     normal: UiColor,
@@ -35,35 +39,116 @@ fn setup_menu(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
     button_colors: Res<ButtonColors>,
+    score: Res<Score>,
 ) {
     commands
-        .spawn_bundle(ButtonBundle {
+        .spawn_bundle(NodeBundle {
             style: Style {
-                size: Size::new(Val::Px(120.0), Val::Px(50.0)),
-                margin: UiRect::all(Val::Auto),
+                flex_direction: FlexDirection::ColumnReverse,
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
-                ..Default::default()
+                ..default()
             },
-            color: button_colors.normal,
-            ..Default::default()
+            color: Color::NONE.into(),
+            ..default()
         })
         .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
+            // Game Over
+            parent
+                .spawn_bundle(TextBundle {
+                    text: Text {
+                        sections: vec![TextSection {
+                            value: "Game Over".to_string(),
+                            style: TextStyle {
+                                font: font_assets.fira_sans.clone(),
+                                font_size: 72.0,
+                                color: Color::WHITE,
+                            },
+                        }],
+                        alignment: Default::default(),
+                    },
+                    style: Style {
+                        margin: UiRect {
+                            bottom: Val::Percent(3.5),
+                            ..default()
+                        },
+                        ..default()
+                    },
+                    ..Default::default()
+                });
+
+            // Your Score
+            parent
+            .spawn_bundle(TextBundle {
                 text: Text {
                     sections: vec![TextSection {
-                        value: "Menu".to_string(),
+                        value: format!("Your score: {}", score.0),
                         style: TextStyle {
                             font: font_assets.fira_sans.clone(),
-                            font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
+                            font_size: 36.0,
+                            color: Color::WHITE,
                         },
                     }],
                     alignment: Default::default(),
                 },
+                style: Style {
+                    margin: UiRect {
+                        bottom: Val::Percent(5.),
+                        ..default()
+                    },
+                    ..default()
+                },
                 ..Default::default()
             });
-        });
+
+            // Menu button
+            parent
+                .spawn_bundle(ButtonBundle {
+                    style: Style {
+                        size: Size::new(Val::Px(120.0), Val::Px(50.0)),
+                        margin: UiRect::all(Val::Auto),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        ..Default::default()
+                    },
+                    color: button_colors.normal,
+                    ..Default::default()
+                })
+                .with_children(|parent| {
+                    parent.spawn_bundle(TextBundle {
+                        text: Text {
+                            sections: vec![TextSection {
+                                value: "Menu".to_string(),
+                                style: TextStyle {
+                                    font: font_assets.fira_sans.clone(),
+                                    font_size: 40.0,
+                                    color: Color::rgb(0.9, 0.9, 0.9),
+                                },
+                            }],
+                            alignment: Default::default(),
+                        },
+                        ..Default::default()
+                    });
+                });
+
+                // Menu button
+                parent.spawn_bundle(TextBundle {
+                    text: Text {
+                        sections: vec![TextSection {
+                            value: "Menu".to_string(),
+                            style: TextStyle {
+                                font: font_assets.fira_sans.clone(),
+                                font_size: 40.0,
+                                color: Color::rgb(0.9, 0.9, 0.9),
+                            },
+                        }],
+                        alignment: Default::default(),
+                    },
+                    ..Default::default()
+                });
+        })
+        .insert(GameOverMenu);
 }
 
 fn click_play_button(
@@ -89,6 +174,6 @@ fn click_play_button(
     }
 }
 
-fn cleanup_menu(mut commands: Commands, button: Query<Entity, With<Button>>) {
+fn cleanup_menu(mut commands: Commands, button: Query<Entity, With<GameOverMenu>>) {
     commands.entity(button.single()).despawn_recursive();
 }

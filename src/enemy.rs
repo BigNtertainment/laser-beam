@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use crate::game_area::EnemySpawn;
 use crate::loading::TextureAssets;
+use crate::score::Score;
 use crate::weapon::EntityHitEvent;
 use crate::{
     character::{Health, Movement},
@@ -159,6 +160,7 @@ fn take_damage(
     mut enemies: Query<(Entity, &mut HitTimer, &mut Health), With<Enemy>>,
     mut entity_hit_event_reader: EventReader<EntityHitEvent>,
     time: Res<Time>,
+    mut score: ResMut<Score>,
 ) {
     let entity_hits = entity_hit_event_reader.iter().collect::<Vec<_>>();
 
@@ -171,6 +173,7 @@ fn take_damage(
                     // TODO: Maybe change it from a hard-coded value to a component
                     if health.take_damage(50.) {
                         commands.entity(enemy_entity).despawn_recursive();
+                        score.0 += 1;
                     }
 
                     info!("remaining_health={:?}", health.get_health());
