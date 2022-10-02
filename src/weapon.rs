@@ -51,7 +51,7 @@ fn shoot(
 ) {
     let ray_cast_filter = QueryFilter::default();
     let player_transform = player_query.single();
-    let shoot_direction = player_transform.up() * time.delta_seconds() * 100000.;
+    let shoot_direction = player_transform.up() * 100000.;
 
     for mut weapon in weapon.iter_mut() {
         match weapon.status {
@@ -59,7 +59,7 @@ fn shoot(
                 lines.line(
                     player_transform.translation,
                     player_transform.translation + shoot_direction,
-                    5.,
+                    0.,
                 );
 
                 if let Some((hit_entity, _)) = rapier_context.cast_ray(
