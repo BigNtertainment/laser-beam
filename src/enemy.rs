@@ -72,13 +72,13 @@ impl Default for EnemyBundle {
 
 fn follow_player(
     player_query: Query<&Transform, (With<Player>, Without<Enemy>)>,
-    mut enemies_query: Query<(&mut Transform, &Movement), With<Enemy>>,
+    mut enemies_query: Query<(&mut Transform, &Movement, &HitTimer), With<Enemy>>,
     time: Res<Time>,
 ) {
     let player_transform = player_query.single();
     let player_translation = player_transform.translation.xy();
 
-    for (mut enemy_transform, movement) in enemies_query.iter_mut() {
+    for (mut enemy_transform, movement, hit_timer) in enemies_query.iter_mut() {
         let to_player = (player_translation - enemy_transform.translation.xy()).normalize();
         enemy_transform.rotation = Quat::from_rotation_arc(Vec3::Y, to_player.extend(0.));
 
@@ -91,7 +91,11 @@ fn follow_player(
         .is_none()
         {
             let forward = enemy_transform.up();
-            enemy_transform.translation += forward * time.delta_seconds() * movement.speed;
+            enemy_transform.translation += forward
+                * time.delta_seconds()
+                * movement.speed
+                // Move slower when getting shot
+                * if !hit_timer.finished() { 0.5 } else { 1. };
         }
     }
 }
@@ -110,7 +114,8 @@ fn spawn_enemies(
     // Make the next enemy spawn faster
     let old_duration = enemy_spawn_timer.duration().as_secs_f32();
 
-    let new_duration = (old_duration - ENEMY_SPAWN_TIME_MINIMUM) * ENEMY_SPAWN_TIME_INCREASE_RATE + ENEMY_SPAWN_TIME_MINIMUM;
+    let new_duration = (old_duration - ENEMY_SPAWN_TIME_MINIMUM) * ENEMY_SPAWN_TIME_INCREASE_RATE
+        + ENEMY_SPAWN_TIME_MINIMUM;
 
     enemy_spawn_timer.set_duration(Duration::from_secs_f32(new_duration));
     enemy_spawn_timer.reset();
