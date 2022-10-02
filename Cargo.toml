@@ -28,7 +28,6 @@ bevy_rapier2d = "0.16.2"
 bevy-inspector-egui = "0.13.0"
 bevy_prototype_debug_lines = "0.8"
 rand = { version = "0.8.3" }
-pathfinding = "3.0.13"
 
 # keep the following in sync with Bevy's dependencies
 winit = { version = "0.26.0", default-features = false }

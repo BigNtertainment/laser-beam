@@ -1,4 +1,3 @@
-use crate::health_bar::HealthBar;
 use crate::loading::TextureAssets;
 use crate::GameState;
 use crate::{

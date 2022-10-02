@@ -43,4 +43,6 @@ pub struct TextureAssets {
     pub wall_texture: Handle<Image>,
     #[asset(path = "textures/enemy.png")]
     pub enemy_texture: Handle<Image>,
+    #[asset(path = "textures/window.png")]
+    pub enemy_spawn_texture: Handle<Image>,
 }
