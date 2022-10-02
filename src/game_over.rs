@@ -52,7 +52,7 @@ fn setup_menu(
             parent.spawn_bundle(TextBundle {
                 text: Text {
                     sections: vec![TextSection {
-                        value: "Main Menu".to_string(),
+                        value: "Menu".to_string(),
                         style: TextStyle {
                             font: font_assets.fira_sans.clone(),
                             font_size: 40.0,

@@ -96,6 +96,7 @@ fn hit_player(
         .is_some()
             && attack_timer.0.tick(time.delta()).just_finished()
         {
+            // TODO: Make AttackDamage component?
             player_health.take_damage(10.);
         }
     }
