@@ -139,6 +139,7 @@ fn update_enemy_position(
             }
 
             enemy_transform.translation += movement_vector.extend(0.0);
+            enemy_transform.rotation = Quat::from_rotation_z(Vec2::Y.angle_between(direction));
         }
     }
 }
