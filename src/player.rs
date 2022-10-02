@@ -52,7 +52,7 @@ fn spawn_player(
         .spawn_bundle(PlayerBundle {
             sprite_bundle: SpriteBundle {
                 texture: textures.player_texture.clone(),
-                transform: Transform::from_translation(Vec3::new(0., 0., 1.))
+                transform: Transform::from_translation(Vec3::new(0., 0., 5.))
                     .with_scale(Vec3::new(0.25, -0.25, 1.)),
                 ..default()
             },

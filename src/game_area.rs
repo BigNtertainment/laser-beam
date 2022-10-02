@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::Collider;
 use rand::{distributions::Standard, prelude::Distribution};
 
 use crate::{
@@ -124,7 +125,6 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
     let mut walls = Vec::new();
 
     let mut spawn_wall = |position: i32, face: Wall| {
-
         let translation = match face {
             Wall::Top => Vec2::new(
                 (position as f32 + 0.5) * WALL_WIDTH,
@@ -154,7 +154,19 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
         let is_enemy_spawn = match get_wall_tile(position, &face, &enemy_spawns) {
             WallTile::Wall => false,
             WallTile::EnemySpawn => true,
-            WallTile::Empty => return commands.spawn().insert(Name::new("Nothing :(")).id(),
+            WallTile::Empty => {
+                return commands
+                    .spawn()
+                    .insert(Transform {
+                        translation: translation.extend(0.),
+                        rotation: Quat::from_rotation_z(rotation),
+                        ..Default::default()
+                    })
+                    .insert(GlobalTransform::default())
+                    .insert(Collider::cuboid(WALL_WIDTH, WALL_HEIGHT))
+                    .insert(Name::new("Nothing :("))
+                    .id()
+            }
         };
 
         let mut wall = commands.spawn_bundle(SpriteBundle {
@@ -170,6 +182,8 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
             },
             ..Default::default()
         });
+
+        wall.insert(Collider::cuboid(WALL_WIDTH, WALL_HEIGHT));
 
         wall.insert(Name::new(if is_enemy_spawn {
             "EnemySpawn"

@@ -1,8 +1,7 @@
 use std::f32::consts::PI;
 
-use crate::{loading::TextureAssets, player::Player, GameState, GAME_AREA_HEIGHT, GAME_AREA_WIDTH};
+use crate::{loading::TextureAssets, player::Player, GameState};
 use bevy::prelude::*;
-use bevy_prototype_debug_lines::DebugLines;
 use bevy_rapier2d::prelude::*;
 
 pub struct WeaponPlugin;
@@ -39,7 +38,7 @@ pub struct Weapon {
 impl Default for Weapon {
     fn default() -> Self {
         Self {
-            cooldown: Timer::from_seconds(0., false), // TODO: Make it 5 again
+            cooldown: Timer::from_seconds(10., false),
             beaming_time: Timer::from_seconds(2., false),
             status: WeaponStatus::Idle,
         }
@@ -82,7 +81,6 @@ fn shoot(
     time: Res<Time>,
     rapier_context: Res<RapierContext>,
     images: Res<Assets<Image>>,
-    mut lines: ResMut<DebugLines>,
 ) {
     let ray_cast_filter = QueryFilter::default();
     let player_transform = player_query.single();
@@ -92,12 +90,18 @@ fn shoot(
     for mut weapon in weapon.iter_mut() {
         laser_visibility.is_visible = weapon.status == WeaponStatus::Beaming;
 
+        let laser_texture_height = images
+            .get(laser_texture)
+            .unwrap()
+            .texture_descriptor
+            .size
+            .height as f32;
+
+        let laser_start = player_transform.translation + shoot_direction * 20.;
+
         match weapon.status {
             WeaponStatus::Beaming => {
-                let laser_slope = shoot_direction.y / shoot_direction.x;
-                let laser_start = player_transform.translation;
-
-                let laser_end = if let Some((hit_entity, toi)) = rapier_context.cast_ray(
+                if let Some((hit_entity, toi)) = rapier_context.cast_ray(
                     player_transform.translation.truncate(),
                     shoot_direction.truncate(),
                     100000.,
@@ -106,47 +110,20 @@ fn shoot(
                 ) {
                     entity_hit_event_w.send(EntityHitEvent(hit_entity));
                     info!("entity hit event sent {:?}", hit_entity);
-                    player_transform.translation + shoot_direction * toi
-                } else {
-                    // https://stackoverflow.com/questions/1585525/how-to-find-the-intersection-point-between-a-line-and-a-rectangle
-                    if -GAME_AREA_HEIGHT / 2. <= laser_slope * GAME_AREA_WIDTH / 2.
-                        && laser_slope * GAME_AREA_WIDTH / 2. <= GAME_AREA_HEIGHT / 2.
-                    {
-                        let (x, y) = if shoot_direction.x > 0. {
-                            (GAME_AREA_WIDTH / 2., laser_slope * GAME_AREA_WIDTH / 2.)
-                        } else {
-                            (-GAME_AREA_WIDTH / 2., -laser_slope * GAME_AREA_WIDTH / 2.)
-                        };
 
-                        Vec3::new(x, y, 0.)
-                    } else {
-                        let (x, y) = if shoot_direction.y > 0. {
-                            (GAME_AREA_HEIGHT / 2. / laser_slope, GAME_AREA_HEIGHT / 2.)
-                        } else {
-                            (-GAME_AREA_HEIGHT / 2. / laser_slope, -GAME_AREA_HEIGHT / 2.)
-                        };
+                    let laser_end = player_transform.translation + shoot_direction * toi;
 
-                        Vec3::new(x, y, 0.)
-                    }
-                };
+                    let laser_position = (laser_start + laser_end) / 2.;
 
-                lines.line(laser_start, laser_end, 0.);
+                    laser_transform.translation = laser_position;
+                    laser_transform.translation.z = 1.;
 
-                let laser_position = laser_start + laser_end / 2.;
-
-                laser_transform.translation = laser_position;
-                laser_transform.rotation = Quat::from_rotation_z(
-                    Vec2::Y.angle_between(shoot_direction.truncate()) - PI / 2.,
-                );
-
-                let laser_texture_height = images
-                    .get(laser_texture)
-                    .unwrap()
-                    .texture_descriptor
-                    .size
-                    .height as f32;
-
-                laser_transform.scale.x = (laser_end - laser_start).length() / laser_texture_height;
+                    laser_transform.rotation = Quat::from_rotation_z(
+                        Vec2::Y.angle_between(shoot_direction.truncate()) - PI / 2.,
+                    );
+    
+                    laser_transform.scale.x = (laser_end - laser_start).length() / laser_texture_height;
+                }
 
                 if weapon.beaming_time.tick(time.delta()).just_finished() {
                     weapon.status = WeaponStatus::Idle;

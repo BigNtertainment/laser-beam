@@ -65,7 +65,7 @@ impl Default for EnemyBundle {
             health: Health::new(100.),
             movement: Movement { speed: 50. },
             enemy: Enemy,
-            collider: Collider::cuboid(32., 32.),
+            collider: Collider::cuboid(64., 64.),
             attack_timer: AttackTimer(Timer::from_seconds(2., false)),
             hit_timer: HitTimer(Timer::from_seconds(0.5, false)),
             name: Name::new("Enemy"),
