@@ -2,6 +2,7 @@ use crate::actions::Actions;
 use crate::camera::MainCamera;
 use crate::character::{Health, Movement, Rotation};
 use crate::loading::TextureAssets;
+use crate::weapon::{Weapon, WeaponBundle};
 use crate::GameState;
 use crate::{WALL_HEIGHT, WALL_WIDTH};
 use bevy::prelude::*;
@@ -44,20 +45,26 @@ impl Plugin for PlayerPlugin {
 }
 
 fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
-    commands.spawn_bundle(PlayerBundle {
-        sprite_budle: SpriteBundle {
-            texture: textures.texture_bevy.clone(),
-            transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
-            ..default()
-        },
-        name: Name::new("Player"),
-        player: Player,
-        health: Health::new(100.0),
-        movement: Movement { speed: 100. },
-        rotation: Rotation {
-            rotation_speed: 1.5,
-        },
-    });
+    commands
+        .spawn_bundle(PlayerBundle {
+            sprite_budle: SpriteBundle {
+                texture: textures.texture_bevy.clone(),
+                transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
+                ..default()
+            },
+            name: Name::new("Player"),
+            player: Player,
+            health: Health::new(100.0),
+            movement: Movement { speed: 100. },
+            rotation: Rotation {
+                rotation_speed: 1.5,
+            },
+        })
+        .with_children(|parent| {
+            parent.spawn_bundle(WeaponBundle {
+                weapon: Weapon::default(),
+            });
+        });
 }
 
 fn move_player(

@@ -1,11 +1,14 @@
 use crate::loading::TextureAssets;
-use crate::GameState;
+use crate::weapon::EntityHitEvent;
 use crate::{
     character::{Health, Movement},
     player::Player,
 };
+use crate::{GameState, GAME_AREA_HEIGHT, GAME_AREA_WIDTH};
 use bevy::math::Vec3Swizzles;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
+use bevy_rapier2d::prelude::*;
+use rand::Rng;
 
 pub struct EnemyPlugin;
 
@@ -15,7 +18,8 @@ impl Plugin for EnemyPlugin {
             .add_system_set(
                 SystemSet::on_update(GameState::Playing)
                     .with_system(hit_player)
-                    .with_system(follow_player),
+                    .with_system(follow_player)
+                    .with_system(take_damage),
             )
             .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(drop_enemies));
     }
@@ -33,6 +37,7 @@ pub struct EnemyBundle {
     movement: Movement,
     enemy: Enemy,
     attack_timer: AttackTimer,
+    collider: Collider,
     #[bundle]
     sprite: SpriteBundle,
 }
@@ -64,18 +69,44 @@ fn follow_player(
 }
 
 fn spawn_enemies(mut commands: Commands, textures: Res<TextureAssets>) {
-    for _ in 0..2 {
+    let mut rng = rand::thread_rng();
+
+    for _ in 0..200 {
+        let position = Vec2::new(
+            rng.gen_range(0.0..(GAME_AREA_WIDTH / 2.)),
+            rng.gen_range(0.0..(GAME_AREA_HEIGHT / 2.)),
+        );
+
         commands.spawn_bundle(EnemyBundle {
             health: Health::new(100.),
             movement: Movement { speed: 50. },
             enemy: Enemy,
             attack_timer: AttackTimer(Timer::from_seconds(2., true)),
+            collider: Collider::cuboid(32., 32.),
             sprite: SpriteBundle {
                 texture: textures.enemy_texture.clone(),
-                transform: Transform::from_translation(Vec3::new(-64., 0., 1.)),
+                transform: Transform::from_translation(position.extend(0.)),
                 ..default()
             },
         });
+    }
+}
+
+fn take_damage(
+    mut enemies: Query<(Entity, &mut Health), With<Enemy>>,
+    mut entity_hit_event_r: EventReader<EntityHitEvent>,
+    mut commands: Commands,
+) {
+    for hit in entity_hit_event_r.iter() {
+        for (enemy_entity, mut health) in enemies.iter_mut() {
+            if enemy_entity.id() == hit.0.id() {
+                if health.take_damage(50.) {
+                    commands.entity(enemy_entity).despawn_recursive();
+                }
+
+                info!("remaining_health={:?}", health.get_health());
+            }
+        }
     }
 }
 

@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use bevy::prelude::{App, ClearColor, Color, Msaa, NonSend, WindowDescriptor};
-use bevy::window::WindowId;
+use bevy::window::{PresentMode, WindowId};
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
 use laser_beam::GamePlugin;
@@ -20,6 +20,7 @@ fn main() {
             height: 720.,
             title: TITLE.to_string(),
             canvas: Some("#bevy".to_owned()),
+            present_mode: PresentMode::Immediate,
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)

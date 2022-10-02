@@ -20,11 +20,12 @@ use crate::health_bar::HealthBarPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
-
 use bevy::app::App;
+
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
+use bevy_rapier2d::prelude::*;
 use camera::CameraPlugin;
 use character::HealthPlugin;
 use debug::DebugPlugin;
@@ -57,6 +58,7 @@ pub struct GamePlugin;
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_state(GameState::Loading)
+            .add_plugin(RapierPhysicsPlugin::<NoUserData>::pixels_per_meter(100.0))
             .add_plugin(DebugPlugin)
             .add_plugin(LoadingPlugin)
             .add_plugin(MenuPlugin)
