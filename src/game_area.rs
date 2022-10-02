@@ -5,7 +5,7 @@ use crate::{
     loading::TextureAssets, GameState, GAME_AREA_HEIGHT, GAME_AREA_WIDTH, WALL_HEIGHT, WALL_WIDTH,
 };
 
-pub const ENEMY_SPAWN_NUMBER: u32 = 4;
+pub const ENEMY_SPAWN_NUMBER: u32 = 6;
 
 pub struct GameAreaPlugin;
 
@@ -52,11 +52,11 @@ impl Distribution<EnemySpawnPoint> for Standard {
         let position = match wall {
             Wall::Top | Wall::Bottom => rng.gen_range(
                 (-GAME_AREA_WIDTH / WALL_WIDTH / 2.) as i32 + 2
-                    ..(GAME_AREA_WIDTH / WALL_WIDTH / 2.) as i32 - 1,
+                    ..(GAME_AREA_WIDTH / WALL_WIDTH / 2.) as i32 - 2,
             ),
             Wall::Left | Wall::Right => rng.gen_range(
                 (-GAME_AREA_HEIGHT / WALL_HEIGHT / 2.) as i32 + 2
-                    ..(GAME_AREA_HEIGHT / WALL_HEIGHT / 2.) as i32 - 1,
+                    ..(GAME_AREA_HEIGHT / WALL_HEIGHT / 2.) as i32 - 2,
             ),
         };
 
