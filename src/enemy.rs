@@ -26,7 +26,11 @@ impl Plugin for EnemyPlugin {
                     .with_system(follow_player)
                     .with_system(take_damage),
             )
-            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(enemy_spawn_cleanup).with_system(drop_enemies));
+            .add_system_set(
+                SystemSet::on_exit(GameState::Playing)
+                    .with_system(enemy_spawn_cleanup)
+                    .with_system(drop_enemies),
+            );
     }
 }
 
@@ -105,7 +109,10 @@ fn follow_player(
 }
 
 fn enemy_spawn_setup(mut commands: Commands) {
-    commands.insert_resource(EnemySpawnTimer(Timer::from_seconds(ENEMY_SPAWN_TIME_DEFAULT, false)));
+    commands.insert_resource(EnemySpawnTimer(Timer::from_seconds(
+        ENEMY_SPAWN_TIME_DEFAULT,
+        false,
+    )));
 }
 
 fn spawn_enemies(

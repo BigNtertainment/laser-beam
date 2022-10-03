@@ -55,32 +55,30 @@ fn setup_menu(
         })
         .with_children(|parent| {
             // Game Over
-            parent
-                .spawn_bundle(TextBundle {
-                    text: Text {
-                        sections: vec![TextSection {
-                            value: "Game Over".to_string(),
-                            style: TextStyle {
-                                font: font_assets.fira_sans.clone(),
-                                font_size: 72.0,
-                                color: Color::WHITE,
-                            },
-                        }],
-                        alignment: Default::default(),
-                    },
-                    style: Style {
-                        margin: UiRect {
-                            bottom: Val::Percent(3.5),
-                            ..default()
+            parent.spawn_bundle(TextBundle {
+                text: Text {
+                    sections: vec![TextSection {
+                        value: "Game Over".to_string(),
+                        style: TextStyle {
+                            font: font_assets.fira_sans.clone(),
+                            font_size: 72.0,
+                            color: Color::WHITE,
                         },
+                    }],
+                    alignment: Default::default(),
+                },
+                style: Style {
+                    margin: UiRect {
+                        bottom: Val::Percent(3.5),
                         ..default()
                     },
-                    ..Default::default()
-                });
+                    ..default()
+                },
+                ..Default::default()
+            });
 
             // Your Score
-            parent
-            .spawn_bundle(TextBundle {
+            parent.spawn_bundle(TextBundle {
                 text: Text {
                     sections: vec![TextSection {
                         value: format!("Your score: {}", score.0),
@@ -132,21 +130,21 @@ fn setup_menu(
                     });
                 });
 
-                // Menu button
-                parent.spawn_bundle(TextBundle {
-                    text: Text {
-                        sections: vec![TextSection {
-                            value: "Menu".to_string(),
-                            style: TextStyle {
-                                font: font_assets.fira_sans.clone(),
-                                font_size: 40.0,
-                                color: Color::rgb(0.9, 0.9, 0.9),
-                            },
-                        }],
-                        alignment: Default::default(),
-                    },
-                    ..Default::default()
-                });
+            // Menu button
+            parent.spawn_bundle(TextBundle {
+                text: Text {
+                    sections: vec![TextSection {
+                        value: "Menu".to_string(),
+                        style: TextStyle {
+                            font: font_assets.fira_sans.clone(),
+                            font_size: 40.0,
+                            color: Color::rgb(0.9, 0.9, 0.9),
+                        },
+                    }],
+                    alignment: Default::default(),
+                },
+                ..Default::default()
+            });
         })
         .insert(GameOverMenu);
 }

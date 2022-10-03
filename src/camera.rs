@@ -1,12 +1,14 @@
 use bevy::{
     prelude::*,
     render::{
+        camera::RenderTarget,
         render_resource::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
         texture::BevyDefault,
-        view::RenderLayers, camera::RenderTarget,
-    }, sprite::{Material2d, MaterialMesh2dBundle},
+        view::RenderLayers,
+    },
+    sprite::{Material2d, MaterialMesh2dBundle},
 };
 
 use crate::shaders::pixelise::PixeliseMaterial;
@@ -74,7 +76,7 @@ fn camera_setup(
     commands
         .spawn_bundle(Camera2dBundle {
             camera: Camera {
-				target: RenderTarget::Image(image_handle.clone()),
+                target: RenderTarget::Image(image_handle.clone()),
                 priority: 0,
                 ..Default::default()
             },
@@ -119,35 +121,33 @@ fn camera_setup(
 }
 
 fn set_post_processing_effects<M: Material2d>(
-	commands: &mut Commands,
-	material: Handle<M>,
+    commands: &mut Commands,
+    material: Handle<M>,
     windows: &Res<Windows>,
-	meshes: &mut ResMut<Assets<Mesh>>,
-	post_processing_pass_layer: &PostProcessingLayer,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    post_processing_pass_layer: &PostProcessingLayer,
 ) {
     let window = windows.primary();
 
-    let size = Vec2::new(
-        window.width(),
-        window.height(),
-    );
+    let size = Vec2::new(window.width(), window.height());
 
     let quad_handle = meshes.add(Mesh::from(shape::Quad::new(size)));
 
-	// Post processing 2d quad, with material using the render texture done by the main camera, with a custom shader.
-	let screen = commands
-		.spawn_bundle(MaterialMesh2dBundle {
-			mesh: quad_handle.into(),
-			material,
-			transform: Transform {
-				translation: Vec3::new(0.0, 0.0, 1.5),
-				..default()
-			},
-			..default()
-		})
-		.insert(post_processing_pass_layer.0)
-		.insert(Name::new("Screen"))
-		.insert(Screen).id();
+    // Post processing 2d quad, with material using the render texture done by the main camera, with a custom shader.
+    let screen = commands
+        .spawn_bundle(MaterialMesh2dBundle {
+            mesh: quad_handle.into(),
+            material,
+            transform: Transform {
+                translation: Vec3::new(0.0, 0.0, 1.5),
+                ..default()
+            },
+            ..default()
+        })
+        .insert(post_processing_pass_layer.0)
+        .insert(Name::new("Screen"))
+        .insert(Screen)
+        .id();
 
-	commands.insert_resource(ScreenRes(screen));
+    commands.insert_resource(ScreenRes(screen));
 }

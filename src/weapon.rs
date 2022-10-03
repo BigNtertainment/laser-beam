@@ -121,8 +121,9 @@ fn shoot(
                     laser_transform.rotation = Quat::from_rotation_z(
                         Vec2::Y.angle_between(shoot_direction.truncate()) - PI / 2.,
                     );
-    
-                    laser_transform.scale.x = (laser_end - laser_start).length() / laser_texture_height;
+
+                    laser_transform.scale.x =
+                        (laser_end - laser_start).length() / laser_texture_height;
                 }
 
                 if weapon.beaming_time.tick(time.delta()).just_finished() {
