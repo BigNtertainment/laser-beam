@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use crate::game_area::EnemySpawn;
-use crate::loading::{TextureAssets, AudioAssets};
+use crate::loading::{AudioAssets, TextureAssets};
 use crate::score::Score;
 use crate::weapon::EntityHitEvent;
 use crate::{
@@ -13,8 +13,8 @@ use bevy::math::Vec3Swizzles;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
 use bevy_kira_audio::{Audio, AudioControl};
 use bevy_rapier2d::prelude::*;
-use rand::Rng;
 use rand::seq::SliceRandom;
+use rand::Rng;
 
 pub struct EnemyPlugin;
 
@@ -79,7 +79,10 @@ impl Default for EnemyBundle {
             collider: Collider::cuboid(64., 64.),
             attack_timer: AttackTimer(Timer::from_seconds(2., false)),
             hit_timer: HitTimer(Timer::from_seconds(0.1, false)),
-            growl_timer: GrowlTimer(Timer::from_seconds(rand::thread_rng().gen_range(2.0..15.), false)),
+            growl_timer: GrowlTimer(Timer::from_seconds(
+                rand::thread_rng().gen_range(2.0..15.),
+                false,
+            )),
             name: Name::new("Enemy"),
             sprite: SpriteBundle::default(),
         }
@@ -204,6 +207,8 @@ fn hit_player(
     mut enemy_query: Query<(&Transform, &mut AttackTimer), With<Enemy>>,
     mut player_query: Query<(&Transform, &mut Health), With<Player>>,
     time: Res<Time>,
+    audio: Res<Audio>,
+    sounds: Res<AudioAssets>,
 ) {
     let (player_transform, mut player_health) = player_query.single_mut();
 
@@ -222,20 +227,29 @@ fn hit_player(
             // TODO: Make AttackDamage component?
             player_health.take_damage(10.);
             attack_timer.reset();
+
+            if let Some(attack) = sounds.attacks.choose(&mut rand::thread_rng()) {
+                audio.play(attack.clone()).with_volume(0.6);
+            }
         }
     }
 }
 
-fn enemy_growl(mut enemies: Query<&mut GrowlTimer>, time: Res<Time>, audio: Res<Audio>, sounds: Res<AudioAssets>) {
+fn enemy_growl(
+    mut enemies: Query<&mut GrowlTimer>,
+    time: Res<Time>,
+    audio: Res<Audio>,
+    sounds: Res<AudioAssets>,
+) {
     for mut growl_timer in enemies.iter_mut() {
         if growl_timer.tick(time.delta()).just_finished() {
-            println!("growl");
-
             if let Some(growl) = sounds.growls.choose(&mut rand::thread_rng()) {
                 audio.play(growl.clone()).with_volume(0.5);
             }
 
-            growl_timer.set_duration(Duration::from_secs_f32(rand::thread_rng().gen_range(15.0..35.)));
+            growl_timer.set_duration(Duration::from_secs_f32(
+                rand::thread_rng().gen_range(15.0..35.),
+            ));
             growl_timer.reset();
         }
     }

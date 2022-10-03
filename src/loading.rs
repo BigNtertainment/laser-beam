@@ -37,6 +37,8 @@ pub struct AudioAssets {
     pub footsteps: Vec<Handle<AudioSource>>,
     #[asset(path = "audio/growls", collection(typed))]
     pub growls: Vec<Handle<AudioSource>>,
+    #[asset(path = "audio/attacks", collection(typed))]
+    pub attacks: Vec<Handle<AudioSource>>,
 }
 
 #[derive(AssetCollection)]

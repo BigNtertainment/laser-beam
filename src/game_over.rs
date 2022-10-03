@@ -129,22 +129,6 @@ fn setup_menu(
                         ..Default::default()
                     });
                 });
-
-            // Menu button
-            parent.spawn_bundle(TextBundle {
-                text: Text {
-                    sections: vec![TextSection {
-                        value: "Menu".to_string(),
-                        style: TextStyle {
-                            font: font_assets.fira_sans.clone(),
-                            font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                        },
-                    }],
-                    alignment: Default::default(),
-                },
-                ..Default::default()
-            });
         })
         .insert(GameOverMenu);
 }
