@@ -226,20 +226,27 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>, images: Res
         .insert(ComputedVisibility::default())
         .insert(Transform::default())
         .insert(GlobalTransform::default())
-        .push_children(&*walls).id();
+        .push_children(&*walls)
+        .id();
 
     // Spawn the floor
-    let floor_size = images.get(&textures.floor_texture).unwrap().texture_descriptor.size;
+    let floor_size = images
+        .get(&textures.floor_texture)
+        .unwrap()
+        .texture_descriptor
+        .size;
 
-    let floor = commands.spawn_bundle(SpriteBundle {
-        texture: textures.floor_texture.clone(),
-        transform: Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::new(
-            GAME_AREA_WIDTH / floor_size.width as f32,
-            GAME_AREA_HEIGHT / floor_size.height as f32,
-            0.
-        )),
-        ..default()
-    }).id();
+    let floor = commands
+        .spawn_bundle(SpriteBundle {
+            texture: textures.floor_texture.clone(),
+            transform: Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::new(
+                GAME_AREA_WIDTH / floor_size.width as f32,
+                GAME_AREA_HEIGHT / floor_size.height as f32,
+                0.,
+            )),
+            ..default()
+        })
+        .id();
 
     commands
         .spawn()

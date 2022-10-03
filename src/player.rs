@@ -44,10 +44,7 @@ impl Plugin for PlayerPlugin {
     }
 }
 
-fn spawn_player(
-    mut commands: Commands,
-    textures: Res<TextureAssets>,
-) {
+fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
     commands
         .spawn_bundle(PlayerBundle {
             sprite_bundle: SpriteBundle {

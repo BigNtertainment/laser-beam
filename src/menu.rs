@@ -1,8 +1,13 @@
-use crate::loading::FontAssets;
+use crate::loading::{FontAssets};
 use crate::GameState;
 use bevy::prelude::*;
 
 pub struct MenuPlugin;
+
+
+#[derive(Component)]
+struct MainMenuUi;
+
 
 /// This plugin is responsible for the game menu (containing only one button...)
 /// The menu is only drawn during the State `GameState::Menu` and is removed when that state is exited
@@ -33,33 +38,59 @@ fn setup_menu(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
     button_colors: Res<ButtonColors>,
+    asset_server: Res<AssetServer>,
 ) {
     commands
-        .spawn_bundle(ButtonBundle {
+        .spawn_bundle(NodeBundle {
             style: Style {
-                size: Size::new(Val::Px(120.0), Val::Px(50.0)),
-                margin: UiRect::all(Val::Auto),
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
+                flex_direction: FlexDirection::ColumnReverse,
                 ..Default::default()
             },
-            color: button_colors.normal,
+            color: Color::NONE.into(),
             ..Default::default()
         })
+        .insert(MainMenuUi)
+        .insert(Name::new("Ui"))
         .with_children(|parent| {
-            parent.spawn_bundle(TextBundle {
-                text: Text {
-                    sections: vec![TextSection {
-                        value: "Play".to_string(),
-                        style: TextStyle {
-                            font: font_assets.fira_sans.clone(),
-                            font_size: 40.0,
-                            color: Color::rgb(0.9, 0.9, 0.9),
-                        },
-                    }],
-                    alignment: Default::default(),
+            parent.spawn_bundle(ImageBundle {
+                style: Style {
+                    ..Default::default()
                 },
+                // i know this shouldnt be done this way but ive tried doing it with the assets collection but
+                // UiImage doesnt work there, you cant put in the handle and thats how they did it in the official example so i guess its ok???
+                image: asset_server.load("textures/logo.png").into(),
                 ..Default::default()
+            });
+
+            parent.spawn_bundle(ButtonBundle {
+                style: Style {
+                    size: Size::new(Val::Px(120.0), Val::Px(50.0)),
+                    margin: UiRect::all(Val::Auto),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..Default::default()
+                },
+                color: button_colors.normal,
+                ..Default::default()
+            })
+            .with_children(|parent| {
+                parent.spawn_bundle(TextBundle {
+                    text: Text {
+                        sections: vec![TextSection {
+                            value: "Play".to_string(),
+                            style: TextStyle {
+                                font: font_assets.fira_sans.clone(),
+                                font_size: 40.0,
+                                color: Color::rgb(0.9, 0.9, 0.9),
+                            },
+                        }],
+                        alignment: Default::default(),
+                    },
+                    ..Default::default()
+                });
             });
         });
 }
@@ -87,6 +118,6 @@ fn click_play_button(
     }
 }
 
-fn cleanup_menu(mut commands: Commands, button: Query<Entity, With<Button>>) {
-    commands.entity(button.single()).despawn_recursive();
+fn cleanup_menu(mut commands: Commands, ui: Query<Entity, With<MainMenuUi>>) {
+    commands.entity(ui.single()).despawn_recursive();
 }

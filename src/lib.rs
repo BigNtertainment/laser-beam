@@ -6,22 +6,22 @@ mod debug;
 mod enemy;
 mod game_area;
 mod game_over;
-mod ui;
 mod loading;
 mod menu;
 mod player;
 mod score;
 mod shaders;
+mod ui;
 mod weapon;
 
 use crate::actions::ActionsPlugin;
 use crate::audio::InternalAudioPlugin;
 use crate::enemy::EnemyPlugin;
 use crate::game_area::GameAreaPlugin;
-use crate::ui::HealthBarPlugin;
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
 use crate::player::PlayerPlugin;
+use crate::ui::HealthBarPlugin;
 use bevy::app::App;
 
 #[cfg(debug_assertions)]

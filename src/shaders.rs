@@ -7,7 +7,7 @@ pub mod pixelise;
 pub struct ShaderPlugin;
 
 impl Plugin for ShaderPlugin {
-	fn build(&self, app: &mut App) {
-		app.add_plugin(Material2dPlugin::<PixeliseMaterial>::default());
-	}
+    fn build(&self, app: &mut App) {
+        app.add_plugin(Material2dPlugin::<PixeliseMaterial>::default());
+    }
 }

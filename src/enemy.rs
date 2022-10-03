@@ -26,7 +26,11 @@ impl Plugin for EnemyPlugin {
                     .with_system(follow_player)
                     .with_system(take_damage),
             )
-            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(enemy_spawn_cleanup).with_system(drop_enemies));
+            .add_system_set(
+                SystemSet::on_exit(GameState::Playing)
+                    .with_system(enemy_spawn_cleanup)
+                    .with_system(drop_enemies),
+            );
     }
 }
 
@@ -67,7 +71,7 @@ impl Default for EnemyBundle {
             enemy: Enemy,
             collider: Collider::cuboid(64., 64.),
             attack_timer: AttackTimer(Timer::from_seconds(2., false)),
-            hit_timer: HitTimer(Timer::from_seconds(0.5, false)),
+            hit_timer: HitTimer(Timer::from_seconds(0.1, false)),
             name: Name::new("Enemy"),
             sprite: SpriteBundle::default(),
         }
@@ -105,7 +109,10 @@ fn follow_player(
 }
 
 fn enemy_spawn_setup(mut commands: Commands) {
-    commands.insert_resource(EnemySpawnTimer(Timer::from_seconds(ENEMY_SPAWN_TIME_DEFAULT, false)));
+    commands.insert_resource(EnemySpawnTimer(Timer::from_seconds(
+        ENEMY_SPAWN_TIME_DEFAULT,
+        false,
+    )));
 }
 
 fn spawn_enemies(
