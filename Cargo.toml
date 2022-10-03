@@ -1,6 +1,6 @@
 [package]
 name = "laser_beam" # ToDo
-version = "0.1.0"
+version = "1.0.0"
 publish = false
 edition = "2021"
 exclude = ["dist", "build", "assets", "credits"]
