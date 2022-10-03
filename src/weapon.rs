@@ -238,8 +238,6 @@ fn play_laser_sound(weapon: Query<&Weapon>, laser_sound: Res<LaserSound>, mut au
                 laser_audio.set_playback_rate(0.8 * progress as f64, audio_tween);
             },
             WeaponStatus::Beaming => {
-                // let progress = weapon.cooldown.percent_left() * 0.25;
-
                 laser_audio.set_volume(0.15, audio_tween.clone());
                 laser_audio.set_playback_rate(0.8, audio_tween);
             }
