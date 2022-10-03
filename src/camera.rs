@@ -1,12 +1,15 @@
 use bevy::{
     prelude::*,
     render::{
+        camera::{RenderTarget, ScalingMode},
         render_resource::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
         texture::BevyDefault,
-        view::RenderLayers, camera::RenderTarget,
-    }, sprite::{Material2d, MaterialMesh2dBundle},
+        view::RenderLayers,
+    },
+    sprite::{Material2d, MaterialMesh2dBundle},
+    window::WindowResized,
 };
 
 use crate::shaders::pixelise::PixeliseMaterial;
@@ -15,7 +18,8 @@ pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(camera_setup);
+        app.add_startup_system(camera_setup)
+            .add_system(window_resized_event);
     }
 }
 
@@ -74,15 +78,17 @@ fn camera_setup(
     commands
         .spawn_bundle(Camera2dBundle {
             camera: Camera {
-				target: RenderTarget::Image(image_handle.clone()),
+                target: RenderTarget::Image(image_handle.clone()),
                 priority: 0,
                 ..Default::default()
             },
+            // projection: OrthographicProjection {
+            //     scaling_mode: ScalingMode::None,
+            //     ..default()
+            // },
             ..Default::default()
         })
-        .insert(UiCameraConfig {
-            show_ui: false,
-        })
+        .insert(UiCameraConfig { show_ui: false })
         .insert(Name::new("MainCamera"))
         .insert(MainCamera);
 
@@ -122,35 +128,67 @@ fn camera_setup(
 }
 
 fn set_post_processing_effects<M: Material2d>(
-	commands: &mut Commands,
-	material: Handle<M>,
+    commands: &mut Commands,
+    material: Handle<M>,
     windows: &Res<Windows>,
-	meshes: &mut ResMut<Assets<Mesh>>,
-	post_processing_pass_layer: &PostProcessingLayer,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    post_processing_pass_layer: &PostProcessingLayer,
 ) {
     let window = windows.primary();
 
-    let size = Vec2::new(
-        window.width(),
-        window.height(),
-    );
+    let size = Vec2::new(window.width(), window.height());
 
     let quad_handle = meshes.add(Mesh::from(shape::Quad::new(size)));
 
-	// Post processing 2d quad, with material using the render texture done by the main camera, with a custom shader.
-	let screen = commands
-		.spawn_bundle(MaterialMesh2dBundle {
-			mesh: quad_handle.into(),
-			material,
-			transform: Transform {
-				translation: Vec3::new(0.0, 0.0, 1.5),
-				..default()
-			},
-			..default()
-		})
-		.insert(post_processing_pass_layer.0)
-		.insert(Name::new("Screen"))
-		.insert(Screen).id();
+    // Post processing 2d quad, with material using the render texture done by the main camera, with a custom shader.
+    let screen = commands
+        .spawn_bundle(MaterialMesh2dBundle {
+            mesh: quad_handle.into(),
+            material,
+            transform: Transform {
+                translation: Vec3::new(0.0, 0.0, 1.5),
+                ..default()
+            },
+            ..default()
+        })
+        .insert(post_processing_pass_layer.0)
+        .insert(Name::new("Screen"))
+        .insert(Screen)
+        .id();
 
-	commands.insert_resource(ScreenRes(screen));
+    commands.insert_resource(ScreenRes(screen));
+}
+
+fn window_resized_event(
+    mut commands: Commands,
+    mut events: EventReader<WindowResized>,
+    mut camera: Query<&mut Camera, With<MainCamera>>,
+    mut images: ResMut<Assets<Image>>,
+    camera_render_image: Res<CameraRenderImage>,
+    post_processing_layer: Res<PostProcessingLayer>,
+) {
+    for event in events.iter() {
+        println!("{:?}", event);
+
+        images
+            .get_mut(&camera_render_image.0)
+            .unwrap()
+            .resize(Extent3d {
+                width: event.width as u32,
+                height: event.height as u32,
+                ..default()
+            });
+
+        // set_post_processing_effects(
+        //     &mut commands,
+        //     material_handle,
+        //     &windows,
+        //     &mut meshes,
+        //     &post_processing_pass_layer_resource,
+        // );
+
+        // let mut camera = camera.single_mut();
+
+        // camera.target = RenderTarget::Image(camera_render_image.0.clone());
+    }
 }
