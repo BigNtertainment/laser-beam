@@ -100,7 +100,7 @@ fn get_wall_tile(position: i32, face: &Wall, enemy_spawns: &Vec<EnemySpawnPoint>
     WallTile::Wall
 }
 
-fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
+fn world_setup(mut commands: Commands, textures: Res<TextureAssets>, images: Res<Assets<Image>>) {
     // Generate enemy spawns
     let mut enemy_spawns = Vec::new();
 
@@ -176,7 +176,7 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
                 wall_texture.clone()
             },
             transform: Transform {
-                translation: translation.extend(0.),
+                translation: translation.extend(1.),
                 rotation: Quat::from_rotation_z(rotation),
                 ..Default::default()
             },
@@ -218,6 +218,29 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
         walls.push(spawn_wall(i, Wall::Right));
     }
 
+    let walls_entity = commands
+        .spawn()
+        // Later move it to an entity containing the entire game area (including floors and windows)
+        .insert(Name::new("Walls"))
+        .insert(Visibility::default())
+        .insert(ComputedVisibility::default())
+        .insert(Transform::default())
+        .insert(GlobalTransform::default())
+        .push_children(&*walls).id();
+
+    // Spawn the floor
+    let floor_size = images.get(&textures.floor_texture).unwrap().texture_descriptor.size;
+
+    let floor = commands.spawn_bundle(SpriteBundle {
+        texture: textures.floor_texture.clone(),
+        transform: Transform::from_translation(Vec3::new(0., 0., 0.)).with_scale(Vec3::new(
+            GAME_AREA_WIDTH / floor_size.width as f32,
+            GAME_AREA_HEIGHT / floor_size.height as f32,
+            0.
+        )),
+        ..default()
+    }).id();
+
     commands
         .spawn()
         // Later move it to an entity containing the entire game area (including floors and windows)
@@ -227,7 +250,7 @@ fn world_setup(mut commands: Commands, textures: Res<TextureAssets>) {
         .insert(ComputedVisibility::default())
         .insert(Transform::default())
         .insert(GlobalTransform::default())
-        .push_children(&*walls);
+        .push_children(&[walls_entity, floor]);
 }
 
 fn drop_game_area(mut commands: Commands, game_area: Query<Entity, With<GameArea>>) {

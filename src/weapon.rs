@@ -116,7 +116,7 @@ fn shoot(
                     let laser_position = (laser_start + laser_end) / 2.;
 
                     laser_transform.translation = laser_position;
-                    laser_transform.translation.z = 1.;
+                    laser_transform.translation.z = 3.;
 
                     laser_transform.rotation = Quat::from_rotation_z(
                         Vec2::Y.angle_between(shoot_direction.truncate()) - PI / 2.,

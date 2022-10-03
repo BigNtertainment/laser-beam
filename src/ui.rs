@@ -1,15 +1,18 @@
-
 use bevy::prelude::*;
 
-use crate::{character::Health, player::Player, GameState};
+use crate::{character::Health, loading::FontAssets, player::Player, score::Score, GameState};
 
 pub struct HealthBarPlugin;
 
 impl Plugin for HealthBarPlugin {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(GameState::Playing).with_system(overlay))
-            .add_system_set(SystemSet::on_update(GameState::Playing).with_system(health_bar_update))
-            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(clean_health_bar));
+            .add_system_set(
+                SystemSet::on_update(GameState::Playing)
+                    .with_system(health_bar_update)
+                    .with_system(score_update),
+            )
+            .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(clean_ui));
     }
 }
 
@@ -17,15 +20,18 @@ impl Plugin for HealthBarPlugin {
 pub struct HealthBar;
 
 #[derive(Component)]
-pub struct HealthBarContainer;
+pub struct ScoreUi;
 
-fn overlay(mut commands: Commands) {
+#[derive(Component)]
+pub struct Ui;
+
+fn overlay(mut commands: Commands, fonts: Res<FontAssets>) {
     commands
         .spawn_bundle(NodeBundle {
             style: Style {
                 size: Size::new(Val::Percent(100.), Val::Percent(100.)),
-                flex_direction: FlexDirection::ColumnReverse,
-                justify_content: JustifyContent::FlexStart,
+                justify_content: JustifyContent::SpaceBetween,
+                align_items: AlignItems::FlexEnd,
                 padding: UiRect::all(Val::Px(20.)),
                 ..default()
             },
@@ -33,6 +39,7 @@ fn overlay(mut commands: Commands) {
             ..default()
         })
         .with_children(|parent| {
+            // Health bar
             parent
                 .spawn_bundle(NodeBundle {
                     style: Style {
@@ -55,8 +62,19 @@ fn overlay(mut commands: Commands) {
                         })
                         .insert(HealthBar);
                 });
+
+            parent
+                .spawn_bundle(TextBundle::from_section(
+                    "0",
+                    TextStyle {
+                        font: fonts.fira_sans.clone(),
+                        font_size: 27.,
+                        color: Color::WHITE,
+                    },
+                ))
+                .insert(ScoreUi);
         })
-        .insert(HealthBarContainer);
+        .insert(Ui);
 }
 
 fn health_bar_update(
@@ -72,17 +90,16 @@ fn health_bar_update(
     let target = (player_health.get_health() / player_health.get_max_health()) * 100.;
     let mut current = match health_bar_style.size.width {
         Val::Percent(val) => val,
-        _ => panic!("health bar width not in percent")
+        _ => panic!("health bar width not in percent"),
     };
     current += (target - current) * rate;
     health_bar_style.size.width = Val::Percent(current);
 }
 
-fn clean_health_bar(
-    mut commands: Commands,
-    health_bar_query: Query<Entity, With<HealthBarContainer>>,
-) {
-    commands
-        .entity(health_bar_query.single())
-        .despawn_recursive();
+fn score_update(mut score_ui: Query<&mut Text, With<ScoreUi>>, score: Res<Score>) {
+    score_ui.single_mut().sections[0].value = format!("{}", score.0);
+}
+
+fn clean_ui(mut commands: Commands, ui_query: Query<Entity, With<Ui>>) {
+    commands.entity(ui_query.single()).despawn_recursive();
 }

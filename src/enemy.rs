@@ -141,7 +141,7 @@ fn spawn_enemies(
         sprite: SpriteBundle {
             texture: textures.enemy_texture.clone(),
             transform: Transform {
-                translation: position.extend(0.),
+                translation: position.extend(2.),
                 scale: Vec3::new(0.25, 0.25, 1.),
                 ..default()
             },
