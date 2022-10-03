@@ -229,7 +229,7 @@ fn hit_player(
             attack_timer.reset();
 
             if let Some(attack) = sounds.attacks.choose(&mut rand::thread_rng()) {
-                audio.play(attack.clone()).with_volume(0.6);
+                audio.play(attack.clone()).with_volume(0.3);
             }
         }
     }
