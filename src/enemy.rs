@@ -71,7 +71,7 @@ impl Default for EnemyBundle {
             enemy: Enemy,
             collider: Collider::cuboid(64., 64.),
             attack_timer: AttackTimer(Timer::from_seconds(2., false)),
-            hit_timer: HitTimer(Timer::from_seconds(0.5, false)),
+            hit_timer: HitTimer(Timer::from_seconds(0.1, false)),
             name: Name::new("Enemy"),
             sprite: SpriteBundle::default(),
         }
