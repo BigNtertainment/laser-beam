@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
     render::{
-        camera::{RenderTarget, ScalingMode},
+        camera::RenderTarget,
         render_resource::{
             Extent3d, TextureDescriptor, TextureDimension, TextureFormat, TextureUsages,
         },
@@ -9,7 +9,6 @@ use bevy::{
         view::RenderLayers,
     },
     sprite::{Material2d, MaterialMesh2dBundle},
-    window::WindowResized,
 };
 
 use crate::shaders::pixelise::PixeliseMaterial;
@@ -18,8 +17,7 @@ pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(camera_setup)
-            .add_system(window_resized_event);
+        app.add_startup_system(camera_setup);
     }
 }
 
@@ -157,38 +155,4 @@ fn set_post_processing_effects<M: Material2d>(
         .id();
 
     commands.insert_resource(ScreenRes(screen));
-}
-
-fn window_resized_event(
-    mut commands: Commands,
-    mut events: EventReader<WindowResized>,
-    mut camera: Query<&mut Camera, With<MainCamera>>,
-    mut images: ResMut<Assets<Image>>,
-    camera_render_image: Res<CameraRenderImage>,
-    post_processing_layer: Res<PostProcessingLayer>,
-) {
-    for event in events.iter() {
-        println!("{:?}", event);
-
-        images
-            .get_mut(&camera_render_image.0)
-            .unwrap()
-            .resize(Extent3d {
-                width: event.width as u32,
-                height: event.height as u32,
-                ..default()
-            });
-
-        // set_post_processing_effects(
-        //     &mut commands,
-        //     material_handle,
-        //     &windows,
-        //     &mut meshes,
-        //     &post_processing_pass_layer_resource,
-        // );
-
-        // let mut camera = camera.single_mut();
-
-        // camera.target = RenderTarget::Image(camera_render_image.0.clone());
-    }
 }
