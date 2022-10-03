@@ -1,11 +1,13 @@
 use crate::actions::Actions;
 use crate::camera::MainCamera;
 use crate::character::{Health, Movement, Rotation};
-use crate::loading::TextureAssets;
+use crate::loading::{TextureAssets, AudioAssets};
 use crate::weapon::{Weapon, WeaponBundle};
 use crate::GameState;
 use crate::{WALL_HEIGHT, WALL_WIDTH};
 use bevy::prelude::*;
+use bevy_kira_audio::{Audio, AudioControl};
+use rand::seq::SliceRandom;
 
 use crate::GAME_AREA_HEIGHT;
 use crate::GAME_AREA_WIDTH;
@@ -17,6 +19,9 @@ pub struct PlayerPlugin;
 #[derive(Component)]
 pub struct Player;
 
+#[derive(Component, Deref, DerefMut)]
+pub struct FootstepTimer(Timer);
+
 #[derive(Bundle)]
 pub struct PlayerBundle {
     #[bundle]
@@ -26,6 +31,7 @@ pub struct PlayerBundle {
     health: Health,
     movement: Movement,
     rotation: Rotation,
+    footstep_timer: FootstepTimer,
 }
 
 /// This plugin handles player related stuff like movement
@@ -60,6 +66,7 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             rotation: Rotation {
                 rotation_speed: 1.5,
             },
+            footstep_timer: FootstepTimer(Timer::from_seconds(0.5, true)),
         })
         .with_children(|parent| {
             parent.spawn_bundle(WeaponBundle {
@@ -69,16 +76,18 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
 }
 
 fn move_player(
+    mut player_query: Query<(&mut Transform, &Handle<Image>, &Movement, &mut FootstepTimer), With<Player>>,
+    images: Res<Assets<Image>>,
+    audio: Res<Audio>,
     time: Res<Time>,
     actions: Res<Actions>,
-    mut player_query: Query<(&mut Transform, &Handle<Image>, &Movement), With<Player>>,
-    images: Res<Assets<Image>>,
+    audio_assets: Res<AudioAssets>,
 ) {
     if actions.player_movement.is_none() {
         return;
     }
 
-    for (mut player_transform, texture, player_movement) in &mut player_query {
+    for (mut player_transform, texture, player_movement, mut footstep_timer) in &mut player_query {
         let movement = Vec3::new(
             actions.player_movement.unwrap().x * player_movement.speed * time.delta_seconds(),
             actions.player_movement.unwrap().y * player_movement.speed * time.delta_seconds(),
@@ -111,6 +120,14 @@ fn move_player(
             .translation
             .y
             .clamp(-bounding_box.y / 2.0, bounding_box.y / 2.0);
+
+        // Play the step sound
+        if footstep_timer.tick(time.delta()).just_finished() {
+            println!("aaa");
+            if let Some(source) = audio_assets.footsteps.choose(&mut rand::thread_rng()) {
+                audio.play(source.clone()).with_volume(10.);
+            }
+        }
     }
 }
 
