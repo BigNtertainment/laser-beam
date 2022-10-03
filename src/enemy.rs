@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use crate::game_area::EnemySpawn;
-use crate::loading::TextureAssets;
+use crate::loading::{TextureAssets, AudioAssets};
 use crate::score::Score;
 use crate::weapon::EntityHitEvent;
 use crate::{
@@ -11,7 +11,9 @@ use crate::{
 use crate::{GameState, WALL_WIDTH};
 use bevy::math::Vec3Swizzles;
 use bevy::{prelude::*, sprite::collide_aabb::collide};
+use bevy_kira_audio::{Audio, AudioControl};
 use bevy_rapier2d::prelude::*;
+use rand::Rng;
 use rand::seq::SliceRandom;
 
 pub struct EnemyPlugin;
@@ -24,7 +26,8 @@ impl Plugin for EnemyPlugin {
                     .with_system(hit_player)
                     .with_system(spawn_enemies)
                     .with_system(follow_player)
-                    .with_system(take_damage),
+                    .with_system(take_damage)
+                    .with_system(enemy_growl),
             )
             .add_system_set(
                 SystemSet::on_exit(GameState::Playing)
@@ -43,6 +46,9 @@ struct AttackTimer(Timer);
 #[derive(Component, Deref, DerefMut)]
 struct HitTimer(Timer);
 
+#[derive(Component, Deref, DerefMut)]
+struct GrowlTimer(Timer);
+
 #[derive(Deref, DerefMut)]
 struct EnemySpawnTimer(Timer);
 
@@ -57,6 +63,7 @@ pub struct EnemyBundle {
     enemy: Enemy,
     attack_timer: AttackTimer,
     hit_timer: HitTimer,
+    growl_timer: GrowlTimer,
     collider: Collider,
     name: Name,
     #[bundle]
@@ -72,6 +79,7 @@ impl Default for EnemyBundle {
             collider: Collider::cuboid(64., 64.),
             attack_timer: AttackTimer(Timer::from_seconds(2., false)),
             hit_timer: HitTimer(Timer::from_seconds(0.1, false)),
+            growl_timer: GrowlTimer(Timer::from_seconds(rand::thread_rng().gen_range(2.0..15.), false)),
             name: Name::new("Enemy"),
             sprite: SpriteBundle::default(),
         }
@@ -214,6 +222,21 @@ fn hit_player(
             // TODO: Make AttackDamage component?
             player_health.take_damage(10.);
             attack_timer.reset();
+        }
+    }
+}
+
+fn enemy_growl(mut enemies: Query<&mut GrowlTimer>, time: Res<Time>, audio: Res<Audio>, sounds: Res<AudioAssets>) {
+    for mut growl_timer in enemies.iter_mut() {
+        if growl_timer.tick(time.delta()).just_finished() {
+            println!("growl");
+
+            if let Some(growl) = sounds.growls.choose(&mut rand::thread_rng()) {
+                audio.play(growl.clone()).with_volume(0.5);
+            }
+
+            growl_timer.set_duration(Duration::from_secs_f32(rand::thread_rng().gen_range(15.0..35.)));
+            growl_timer.reset();
         }
     }
 }
