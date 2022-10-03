@@ -11,12 +11,12 @@ use winit::window::Icon;
 
 pub const TITLE: &str = "LASER BEAM!";
 
-#[cfg(target_os = "wasm")]
+#[cfg(target_arch="wasm32")]
 fn window_size() -> (f32, f32) {
     (948., 533.)
 }
 
-#[cfg(not(target_os = "wasm"))]
+#[cfg(not(target_arch="wasm32"))]
 fn window_size() -> (f32, f32) {
     (1280., 720.)
 }
