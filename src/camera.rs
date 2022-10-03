@@ -80,6 +80,9 @@ fn camera_setup(
             },
             ..Default::default()
         })
+        .insert(UiCameraConfig {
+            show_ui: false,
+        })
         .insert(Name::new("MainCamera"))
         .insert(MainCamera);
 
