@@ -1,7 +1,12 @@
 use std::f32::consts::PI;
 
-use crate::{loading::TextureAssets, player::Player, GameState};
+use crate::{
+    loading::{AudioAssets, TextureAssets},
+    player::Player,
+    GameState,
+};
 use bevy::prelude::*;
+use bevy_kira_audio::{Audio, AudioControl, AudioInstance, AudioTween};
 use bevy_rapier2d::prelude::*;
 
 pub struct WeaponPlugin;
@@ -11,7 +16,7 @@ impl Plugin for WeaponPlugin {
         app.add_event::<EntityHitEvent>()
             .add_system_set(SystemSet::on_enter(GameState::Playing).with_system(setup_laser))
             .add_system_set(SystemSet::on_exit(GameState::Playing).with_system(drop_laser))
-            .add_system_set(SystemSet::on_update(GameState::Playing).with_system(shoot));
+            .add_system_set(SystemSet::on_update(GameState::Playing).with_system(shoot).with_system(play_laser_sound));
     }
 }
 
@@ -69,7 +74,15 @@ struct LaserEndBundle {
     laser_end: LaserEnd,
 }
 
-fn setup_laser(mut commands: Commands, textures: Res<TextureAssets>) {
+#[derive(Deref, DerefMut)]
+struct LaserSound(Handle<AudioInstance>);
+
+fn setup_laser(
+    mut commands: Commands,
+    textures: Res<TextureAssets>,
+    audio: Res<Audio>,
+    sounds: Res<AudioAssets>,
+) {
     commands
         .spawn_bundle(LaserBundle {
             sprite_bundle: SpriteBundle {
@@ -92,6 +105,8 @@ fn setup_laser(mut commands: Commands, textures: Res<TextureAssets>) {
             laser_end: LaserEnd,
         })
         .insert(Name::new("LaserEnd"));
+
+    commands.insert_resource(LaserSound(audio.play(sounds.laser.clone()).with_volume(0.).with_playback_rate(0.).looped().handle()));
 }
 
 fn drop_laser(mut commands: Commands, laser: Query<Entity, With<Laser>>) {
@@ -190,7 +205,8 @@ fn shoot<'a>(
                     laser_end_transform.translation = laser_end
                         + laser_end_transform.right()
                             * laser_end_transform.scale.y
-                            * laser_end_texture_size.height as f32 / 4.;
+                            * laser_end_texture_size.height as f32
+                            / 4.;
                 }
 
                 if weapon.beaming_time.tick(time.delta()).just_finished() {
@@ -203,6 +219,29 @@ fn shoot<'a>(
                     weapon.beaming_time.reset();
                     weapon.status = WeaponStatus::Beaming;
                 }
+            }
+        }
+    }
+}
+
+fn play_laser_sound(weapon: Query<&Weapon>, laser_sound: Res<LaserSound>, mut audio_instances: ResMut<Assets<AudioInstance>>, time: Res<Time>) {
+    let weapon = weapon.single();
+
+    if let Some(laser_audio) = audio_instances.get_mut(&laser_sound.0) {
+        let audio_tween = AudioTween::linear(time.delta());
+    
+        match weapon.status {
+            WeaponStatus::Idle => {
+                let progress = 1. - weapon.cooldown.percent_left();
+    
+                laser_audio.set_volume(0.05 + 0.1 * progress as f64, audio_tween.clone());
+                laser_audio.set_playback_rate(0.8 * progress as f64, audio_tween);
+            },
+            WeaponStatus::Beaming => {
+                // let progress = weapon.cooldown.percent_left() * 0.25;
+
+                laser_audio.set_volume(0.15, audio_tween.clone());
+                laser_audio.set_playback_rate(0.8, audio_tween);
             }
         }
     }

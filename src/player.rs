@@ -124,7 +124,7 @@ fn move_player(
         // Play the step sound
         if footstep_timer.tick(time.delta()).just_finished() {
             if let Some(source) = audio_assets.footsteps.choose(&mut rand::thread_rng()) {
-                audio.play(source.clone()).with_volume(0.75);
+                audio.play(source.clone()).with_volume(0.5);
             }
         }
     }
