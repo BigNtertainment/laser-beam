@@ -62,9 +62,9 @@ fn spawn_player(mut commands: Commands, textures: Res<TextureAssets>) {
             name: Name::new("Player"),
             player: Player,
             health: Health::new(100.0),
-            movement: Movement { speed: 100. },
+            movement: Movement { speed: 80. },
             rotation: Rotation {
-                rotation_speed: 1.5,
+                rotation_speed: 1.15,
             },
             footstep_timer: FootstepTimer(Timer::from_seconds(0.5, true)),
         })

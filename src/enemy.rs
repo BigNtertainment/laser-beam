@@ -52,7 +52,7 @@ struct GrowlTimer(Timer);
 #[derive(Deref, DerefMut)]
 struct EnemySpawnTimer(Timer);
 
-pub const ENEMY_SPAWN_TIME_DEFAULT: f32 = 7.;
+pub const ENEMY_SPAWN_TIME_DEFAULT: f32 = 5.;
 pub const ENEMY_SPAWN_TIME_INCREASE_RATE: f32 = 0.95;
 pub const ENEMY_SPAWN_TIME_MINIMUM: f32 = 0.5;
 
@@ -74,7 +74,7 @@ impl Default for EnemyBundle {
     fn default() -> Self {
         Self {
             health: Health::new(100.),
-            movement: Movement { speed: 50. },
+            movement: Movement { speed: 75. },
             enemy: Enemy,
             collider: Collider::cuboid(64., 64.),
             attack_timer: AttackTimer(Timer::from_seconds(2., false)),

@@ -11,13 +11,25 @@ use winit::window::Icon;
 
 pub const TITLE: &str = "LASER BEAM!";
 
+#[cfg(target_os = "wasm")]
+fn window_size() -> (f32, f32) {
+    (948., 533.)
+}
+
+#[cfg(not(target_os = "wasm"))]
+fn window_size() -> (f32, f32) {
+    (1280., 720.)
+}
+
 fn main() {
+    let size = window_size();
+
     App::new()
         .insert_resource(Msaa { samples: 1 })
         .insert_resource(ClearColor(Color::rgb(0.1, 0.1, 0.1)))
         .insert_resource(WindowDescriptor {
-            width: 1280.,
-            height: 720.,
+            width: size.0,
+            height: size.1,
             title: TITLE.to_string(),
             canvas: Some("#bevy".to_owned()),
             present_mode: PresentMode::Immediate,
