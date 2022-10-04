@@ -11,12 +11,12 @@ use winit::window::Icon;
 
 pub const TITLE: &str = "LASER BEAM!";
 
-#[cfg(target_os = "wasm32")]
+#[cfg(target_arch="wasm32")]
 fn window_size() -> (f32, f32) {
     (948., 533.)
 }
 
-#[cfg(not(target_os = "wasm32"))]
+#[cfg(not(target_arch="wasm32"))]
 fn window_size() -> (f32, f32) {
     (1280., 720.)
 }
@@ -31,8 +31,6 @@ fn main() {
             width: size.0,
             height: size.1,
             title: TITLE.to_string(),
-            canvas: Some("#bevy".to_owned()),
-            present_mode: PresentMode::Immediate,
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
