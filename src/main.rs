@@ -31,8 +31,6 @@ fn main() {
             width: size.0,
             height: size.1,
             title: TITLE.to_string(),
-            canvas: Some("#bevy".to_owned()),
-            present_mode: PresentMode::Immediate,
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)

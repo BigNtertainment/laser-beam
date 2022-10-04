@@ -33,13 +33,33 @@ pub struct FontAssets {
 pub struct AudioAssets {
     #[asset(path = "audio/flying.ogg")]
     pub flying: Handle<AudioSource>,
-    #[asset(path = "audio/footsteps", collection(typed))]
+    #[asset(
+        paths(
+            "audio/footsteps/footstep_1.wav",
+            "audio/footsteps/footstep_2.wav",
+            "audio/footsteps/footstep_3.wav",
+            "audio/footsteps/footstep_4.wav"
+        ),
+        collection(typed)
+    )]
     pub footsteps: Vec<Handle<AudioSource>>,
-    #[asset(path = "audio/growls", collection(typed))]
+    #[asset(
+        paths(
+            "audio/growls/growl_1.wav",
+            "audio/growls/growl_2.wav",
+            "audio/growls/growl_3.wav",
+            "audio/growls/growl_4.wav",
+            "audio/growls/growl_5.wav"
+        ),
+        collection(typed)
+    )]
     pub growls: Vec<Handle<AudioSource>>,
-    #[asset(path = "audio/attacks", collection(typed))]
+    #[asset(
+        paths("audio/attacks/attack_1.wav", "audio/attacks/attack_2.wav"),
+        collection(typed)
+    )]
     pub attacks: Vec<Handle<AudioSource>>,
-    #[asset(path="audio/laser/laser.wav")]
+    #[asset(path = "audio/laser/laser.wav")]
     pub laser: Handle<AudioSource>,
 }
 
