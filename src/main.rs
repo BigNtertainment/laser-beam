@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use bevy::prelude::{App, ClearColor, Color, Msaa, NonSend, WindowDescriptor};
-use bevy::window::{PresentMode, WindowId};
+use bevy::window::WindowId;
 use bevy::winit::WinitWindows;
 use bevy::DefaultPlugins;
 use laser_beam::GamePlugin;
@@ -13,7 +13,7 @@ pub const TITLE: &str = "LASER BEAM!";
 
 #[cfg(target_arch="wasm32")]
 fn window_size() -> (f32, f32) {
-    (948., 533.)
+    (931., 516.)
 }
 
 #[cfg(not(target_arch="wasm32"))]

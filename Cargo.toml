@@ -1,5 +1,5 @@
 [package]
-name = "laser_beam" # ToDo
+name = "laser_beam"
 version = "1.0.0"
 publish = false
 edition = "2021"
